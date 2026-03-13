@@ -1,6 +1,7 @@
 package com.Market.MeatShop.Products.Entities;
 
 import com.Market.MeatShop.Finances.Entities.InvoiceComponent;
+import com.Market.MeatShop.Products.Enums.ProductTypes;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,12 +40,19 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToMany(fetch = FetchType.LAZY , mappedBy = "product")
+    @OneToMany(fetch = FetchType.LAZY , mappedBy = "parentProduct")
     private List<ProductComponent> compontents;
 
-    @OneToMany(fetch = FetchType.LAZY , mappedBy = "product")
-    List<StockMovment>  stockMovments;
+    @OneToMany(fetch = FetchType.LAZY , mappedBy = "component")
+    private List<ProductComponent> includedInComposition;
 
-    @OneToMany(mappedBy = "product")
-    List<InvoiceComponent> invoicesComponents;
+    @OneToMany(fetch = FetchType.LAZY , mappedBy = "product")
+    private List<StockMovment> stockMovements;
+
+    @OneToMany(  fetch = FetchType.LAZY ,  mappedBy = "product" )
+    private List<InvoiceComponent> invoicesComponents;
+
+    @Column(name = "product_type" ,nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ProductTypes productType;
 }

@@ -22,11 +22,14 @@ public class ProductComponent {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
-    private Product product;
+    private Product parentProduct;
 
     @Column(name = "ratio_in_kg",nullable = false )
     @DecimalMin(value = "0.001", message = "Value must be at least 0.01")
     @DecimalMax(value = "0.999", message = "Value must be at most 0.99")
     private double ratioInKg;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Product component;
 
 }

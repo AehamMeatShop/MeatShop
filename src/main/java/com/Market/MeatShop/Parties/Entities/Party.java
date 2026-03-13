@@ -1,5 +1,8 @@
 package com.Market.MeatShop.Parties.Entities;
+import com.Market.MeatShop.Employees.Entities.Employee;
+import com.Market.MeatShop.Finances.Entities.CashTransaction;
 import com.Market.MeatShop.Finances.Entities.Invoice;
+import com.Market.MeatShop.Parties.Enums.PartyType;
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -33,4 +36,13 @@ public class Party {
     @OneToMany(mappedBy = "party" , fetch = FetchType.LAZY)
     List<Invoice> invoices;
 
+    @OneToMany(mappedBy = "party")
+    List<CashTransaction> cashTransactions;
+
+    @Column(name = "party_type" , nullable = false)
+    @Enumerated(EnumType.STRING)
+    PartyType  partyType;
+
+    @OneToOne(mappedBy = "party")
+    private Employee employee;
 }

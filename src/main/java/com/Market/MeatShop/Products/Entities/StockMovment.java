@@ -1,6 +1,7 @@
 package com.Market.MeatShop.Products.Entities;
 import com.Market.MeatShop.Finances.Entities.Invoice;
 import com.Market.MeatShop.Finances.Entities.InvoiceComponent;
+import com.Market.MeatShop.Products.Enums.StockMovmentsTypes;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -29,6 +30,13 @@ public class StockMovment {
     @JoinColumn(name = "invoice_component_id", nullable = true)
     private InvoiceComponent invoiceComponent;
 
+    @Column(name = "quantity" , nullable = false)
+    private double quantity;
 
+    @Column(name = "stock_movment_type" , nullable = false)
+    @Enumerated(EnumType.STRING)
+    private StockMovmentsTypes stockMovmentsType;
 
+    @Column(name = "notes" , nullable = true , length = 1023)
+    private String notes;
 }

@@ -30,14 +30,14 @@ public class Invoice {
     InvoiceType invoiceType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "party_id" , nullable = true)
+    @JoinColumn(name = "party_id" , nullable = false)
     private Party party;
 
-    @Column(name = "description" , nullable = true ,length = 1023)
-    private String description;
+    @Column(name = "notes" , nullable = true ,length = 1023)
+    private String notes;
 
     @CreationTimestamp
-    @Column(name = "created_at" , nullable = false)
+    @Column(name = "created_at" , nullable = false ,updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
@@ -47,6 +47,8 @@ public class Invoice {
     @OneToMany(mappedBy = "invoice")
     private List<InvoiceComponent> invoicesComponents;
 
+    @OneToMany(mappedBy = "invoice" , fetch = FetchType.LAZY)
+    List<CashTransaction> cashTransactions;
 
 
 }

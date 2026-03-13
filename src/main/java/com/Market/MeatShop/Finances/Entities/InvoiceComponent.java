@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 
-@Table(name= "invoice_Details")
+@Table(name= "invoice_components")
 @Entity
 @Data
 @AllArgsConstructor
@@ -39,7 +39,7 @@ public class InvoiceComponent {
     @JoinColumn(name = "invoice_id", nullable = false)
     private Invoice invoice;
 
-    @OneToMany(mappedBy = "invoice_component")
+    @OneToMany(mappedBy = "invoice_component" , fetch = FetchType.LAZY)
     private List<StockMovment> stockMovments;
 
 

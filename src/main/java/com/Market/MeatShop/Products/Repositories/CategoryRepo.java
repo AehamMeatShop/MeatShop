@@ -1,0 +1,7 @@
+package com.Market.MeatShop.Products.Repositories;
+
+import com.Market.MeatShop.Products.Entities.Category;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface CategoryRepo extends JpaRepository<Category,Long> {
+}

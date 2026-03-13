@@ -1,0 +1,8 @@
+CREATE TABLE categories (
+
+   id BIGSERIAL  PRIMARY KEY,
+   name VARCHAR(100) NOT NULL ,
+   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX idx_category_name ON categories(name);

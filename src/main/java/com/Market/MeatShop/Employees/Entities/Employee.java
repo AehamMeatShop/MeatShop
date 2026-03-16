@@ -1,5 +1,7 @@
 package com.Market.MeatShop.Employees.Entities;
 
+import com.Market.MeatShop.Employees.Enums.EmployeeRole;
+import com.Market.MeatShop.Employees.Enums.EmployeeStatus;
 import com.Market.MeatShop.Parties.Entities.Party;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
@@ -38,5 +40,13 @@ public class Employee {
     @UpdateTimestamp
     @Column( name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EmployeeRole role;
+
+     @Column(name = "status" , nullable = false)
+     @Enumerated(EnumType.STRING)
+     private EmployeeStatus status;
 
 }

@@ -6,11 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
-@Table(name= "party_contacts" , uniqueConstraints = @UniqueConstraint(columnNames = {"method", "identifier"}))
+@Table(name= "party_contacts"  ,uniqueConstraints = @UniqueConstraint(columnNames = {"method", "identifier"}))
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+
 
 public class PartyContact {
 

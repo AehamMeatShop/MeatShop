@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -30,16 +31,16 @@ public class InvoiceComponent {
 
     @Column(name = "quantity_kg" , nullable = false )
     @DecimalMin(value = "0.001" , message = "quantity at least 1 gram = 0.001 kg")
-    private double quantityKg;
+    private BigDecimal quantityKg;
 
     @Column(name = "price_kg")
-    private double priceKg;
+    private BigDecimal priceKg;
 
     @ManyToOne
     @JoinColumn(name = "invoice_id", nullable = false)
     private Invoice invoice;
 
-    @OneToMany(mappedBy = "invoice_component" , fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "invoiceComponent" , fetch = FetchType.LAZY)
     private List<StockMovment> stockMovments;
 
 

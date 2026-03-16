@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.math.BigDecimal;
 import java.security.PrivateKey;
 
 @Table(name= "product_components")
@@ -27,9 +28,13 @@ public class ProductComponent {
     @Column(name = "ratio_in_kg",nullable = false )
     @DecimalMin(value = "0.001", message = "Value must be at least 0.01")
     @DecimalMax(value = "0.999", message = "Value must be at most 0.99")
-    private double ratioInKg;
+    private BigDecimal ratioInKg;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "component_id" , nullable = false)
     private Product component;
+
+
+
 
 }

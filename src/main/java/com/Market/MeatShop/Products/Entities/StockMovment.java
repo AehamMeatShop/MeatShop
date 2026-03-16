@@ -1,16 +1,18 @@
 package com.Market.MeatShop.Products.Entities;
-import com.Market.MeatShop.Finances.Entities.Invoice;
+
 import com.Market.MeatShop.Finances.Entities.InvoiceComponent;
 import com.Market.MeatShop.Products.Enums.StockMovmentsTypes;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import java.security.PrivateKey;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 
 @Table(name= "stock_movments")
 @Entity
@@ -26,12 +28,20 @@ public class StockMovment {
     @JoinColumn(name = "product_id" , nullable = false)
     private Product product;
 
+    @Column( name = "created_at", nullable = false , updatable = false , insertable = false )
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @Column( name = "updated_at", nullable = true , insertable = false )
+    @UpdateTimestamp
+    LocalDateTime updatedAt;
+
     @ManyToOne
     @JoinColumn(name = "invoice_component_id", nullable = true)
     private InvoiceComponent invoiceComponent;
 
     @Column(name = "quantity" , nullable = false)
-    private double quantity;
+    private BigDecimal quantity;
 
     @Column(name = "stock_movment_type" , nullable = false)
     @Enumerated(EnumType.STRING)

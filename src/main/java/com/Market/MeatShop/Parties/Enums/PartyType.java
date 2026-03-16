@@ -4,5 +4,5 @@ public enum PartyType {
     SUPPLIER,
     CUSTOMER,
     COMPLEX,
-    EMPLOYEE,
+    EMPLOYEE
 }

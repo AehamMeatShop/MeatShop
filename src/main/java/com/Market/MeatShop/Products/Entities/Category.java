@@ -24,7 +24,7 @@ public class Category {
     private String name;
 
     @CreationTimestamp
-    @Column(name = "created_at" , nullable = false)
+    @Column(name = "created_at" , nullable = false ,unique = true)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
@@ -32,7 +32,7 @@ public class Category {
     private  LocalDateTime updatedAt;
 
     @OneToMany(fetch = FetchType.LAZY , mappedBy = "category")
-    private List<Product> productList;
+    private List<Product> products;
 
 
 }

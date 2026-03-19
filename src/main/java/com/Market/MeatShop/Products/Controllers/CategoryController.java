@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
@@ -33,6 +31,22 @@ public class CategoryController {
     @GetMapping
     public ResponseEntity<?> viewAllCategories() {
         return ResponseEntity.ok(categoryService.viewAllCategories());
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> viewCategoryById(@PathVariable long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(categoryService.viewCategoryById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateCategory(@PathVariable long id, @RequestBody @Valid CategoryCreateRequest categoryCreateRequest){
+       return ResponseEntity.status(HttpStatus.ACCEPTED).body(categoryService.updateCategory(categoryCreateRequest,id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCategory(@PathVariable long id) {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(categoryService.deleteCategory(id));
     }
 
 }

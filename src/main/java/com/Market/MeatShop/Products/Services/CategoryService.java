@@ -3,12 +3,11 @@ package com.Market.MeatShop.Products.Services;
 import com.Market.MeatShop.Products.DTOs.CategoryViewDTO;
 import com.Market.MeatShop.Products.DTOs.Requests.CategoryCreateRequest;
 import com.Market.MeatShop.Products.Entities.Category;
-import com.Market.MeatShop.Products.Exceptions.CategoryAlreadyExist;
+import com.Market.MeatShop.Shared.Exceptions.AlreadyHaveSame;
+import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
 import com.Market.MeatShop.Products.Mappers.CategoryMapper;
 import com.Market.MeatShop.Products.Repositories.CategoryRepo;
 
-import org.apache.coyote.BadRequestException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,6 +35,33 @@ public class CategoryService {
 
     public List<CategoryViewDTO> viewAllCategories() {
         return categoryMapper.toCategoryViewDTOList(categoryRepo.findAll());
+    }
+
+    public CategoryViewDTO viewCategoryById(Long id) {
+        Optional<Category> category = categoryRepo.findById(id);
+        if (category.isPresent()) {return categoryMapper.toCategoryViewDTO(category.get());}
+        throw new TargetNotFound("Category not found");
+    }
+
+    public CategoryViewDTO updateCategory(CategoryCreateRequest categoryCreateRequest , Long id) {
+       Optional<Category> category = categoryRepo.findById(id);
+       if (category.isPresent()) {
+
+           Category updateCategory= category.get();
+           categoryMapper.updateFromRequest(categoryCreateRequest , updateCategory );
+           categoryRepo.saveAndFlush(updateCategory);
+           return categoryMapper.toCategoryViewDTO(updateCategory);
+       }
+       throw new TargetNotFound("Category not found");
+    }
+
+    public boolean deleteCategory(Long id) {
+       if(!categoryRepo.existsById(id)){
+         throw new TargetNotFound("Category not found");
+       }
+
+        categoryRepo.deleteById(id);
+        return true;
     }
 
 }

@@ -2,6 +2,7 @@ package com.Market.MeatShop.Products.Mappers;
 
 
 import com.Market.MeatShop.Products.DTOs.ProductViewDTO;
+import com.Market.MeatShop.Products.DTOs.Requests.ProductCreateRequest;
 import com.Market.MeatShop.Products.Entities.Product;
 import org.mapstruct.Mapper;
 
@@ -13,4 +14,5 @@ public interface ProductMapper {
     Product toProduct(ProductViewDTO productViewDTO);
     List<ProductViewDTO> toProductViewDTOList(List<Product> products);
     List<Product> toProductList(List<ProductViewDTO> productViewDTOs);
+    Product toProduct(ProductCreateRequest productCreateRequest);
 }

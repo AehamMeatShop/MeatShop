@@ -5,6 +5,7 @@ CREATE TABLE products(
      updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
      description VARCHAR(1023),
      category_id BIGINT NOT NULL ,
+     product_type VARCHAR(255) NOT NULL ,
      CONSTRAINT fk_categories_product FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE NO ACTION
 );
 

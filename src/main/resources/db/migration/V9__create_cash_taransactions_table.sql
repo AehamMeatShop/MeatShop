@@ -1,8 +1,8 @@
-CREATE TYPE cash_trans_types AS ENUM('RECEIPT', 'PAYMENT', 'EXPENSES' , 'EMP_SALARY');
+
 
 CREATE TABLE cash_transactions (
     id BIGSERIAL PRIMARY KEY ,
-    type cash_trans_types NOT NULL ,
+    type VARCHAR(255) NOT NULL ,
     party_id BIGINT NOT NULL ,
     notes varchar(1023) ,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -1,4 +1,3 @@
-CREATE TYPE stock_movment_types AS ENUM('PURCHASE','SELL','ADJUSTMENT','TRANSFER','TRANSFORM','WASTE','SHRINKAGE');
 
 CREATE TABLE stock_movments (
    id BIGSERIAL PRIMARY KEY ,
@@ -7,7 +6,7 @@ CREATE TABLE stock_movments (
    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
    invoice_component_id BIGINT NULL ,
    quantity DECIMAL(12,3) NOT NULL ,
-   stock_movment_type stock_movment_types NOT NULL ,
+   stock_movment_type VARCHAR(255) NOT NULL ,
    notes varchar(1023) NULL ,
 
     CONSTRAINT fk_product_stock_movment FOREIGN KEY(product_id) REFERENCES products(id),

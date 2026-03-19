@@ -1,8 +1,8 @@
-CREATE TYPE invoice_types AS ENUM( 'SELL','BUY');
+
 
 CREATE TABLE invoices(
     id BIGSERIAL PRIMARY KEY ,
-    invoice_type invoice_types NOT NULL ,
+    invoice_type VARCHAR(255) NOT NULL ,
     party_id BIGINT NOT NULL ,
     notes VARCHAR(1023) NULL ,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

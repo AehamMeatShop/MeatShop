@@ -2,6 +2,7 @@ package com.Market.MeatShop.Products.Services;
 
 import com.Market.MeatShop.Products.DTOs.ProductViewDTO;
 import com.Market.MeatShop.Products.DTOs.Requests.ProductCreateRequest;
+import com.Market.MeatShop.Products.DTOs.Requests.ProductUpdateRequest;
 import com.Market.MeatShop.Products.Entities.Category;
 import com.Market.MeatShop.Products.Entities.Product;
 import com.Market.MeatShop.Products.Mappers.CategoryMapper;
@@ -53,6 +54,36 @@ public class ProductService {
 
 
 
+
+    }
+
+
+    public ProductViewDTO updateProduct(ProductUpdateRequest productUpdateRequest , long id) {
+       Product product = productRepo.findById(id)
+               .orElseThrow(() -> new TargetNotFound("Product Id : " + id));
+
+       productMapper.updateFromRequest( productUpdateRequest,product);
+
+       if(productUpdateRequest.categoryId() != null ) {
+
+           Category category = categoryRepo.findById(productUpdateRequest.categoryId())
+                   .orElseThrow(() -> new TargetNotFound("Category : " + productUpdateRequest.categoryId() + " not found"));
+
+
+           product.setCategory(category);
+       }
+
+        product = productRepo.saveAndFlush(product);
+
+        return productMapper.toProductViewDTO(product);
+
+    }
+
+    public void deleteProduct(long id) {
+        if(!productRepo.existsById(id)){
+            throw new TargetNotFound("Product Id : " + id);
+        }
+        productRepo.deleteById(id);
 
     }
 

@@ -2,6 +2,7 @@ package com.Market.MeatShop.Products.Controllers;
 
 
 import com.Market.MeatShop.Products.DTOs.Requests.ProductCreateRequest;
+import com.Market.MeatShop.Products.DTOs.Requests.ProductUpdateRequest;
 import com.Market.MeatShop.Products.Services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,17 @@ public class ProductController {
     @PostMapping("")
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductCreateRequest productCreateRequest){
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.createProduct(productCreateRequest));
+    }
+
+    @PutMapping("/{id}")
+     public ResponseEntity<?> updateProduct(@Valid @RequestBody ProductUpdateRequest productUpdateRequest , @PathVariable long id){
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(productService.updateProduct(productUpdateRequest , id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteProduct(@PathVariable long id){
+        productService.deleteProduct(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
 
 }

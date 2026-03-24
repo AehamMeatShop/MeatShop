@@ -22,7 +22,12 @@ import java.util.List;
 @NoArgsConstructor
 public class Employee {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "employees_seq_gen",
+            sequenceName = "employees_id_seq",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column(name = "salary" , nullable = false)

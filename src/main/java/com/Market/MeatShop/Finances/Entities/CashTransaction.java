@@ -22,7 +22,12 @@ import java.util.List;
 @NoArgsConstructor
 public class CashTransaction {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "cash_transactions_seq_gen",
+            sequenceName = "cash_transactions_id_seq",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column( name = "type",nullable = false)
@@ -43,6 +48,7 @@ public class CashTransaction {
     @Column(name = "ammount" , nullable = false)
     @DecimalMin(value = "1" )
     private long amount;
+
 
 
     @AssertTrue(message = "the party most be exist if the trans type is not expenses")

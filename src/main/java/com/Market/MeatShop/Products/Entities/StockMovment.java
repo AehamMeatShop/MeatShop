@@ -21,7 +21,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class StockMovment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "stock_movments_seq_gen",
+            sequenceName = "stock_movments_id_seq",
+            allocationSize = 1
+    )
     private long id;
 
     @ManyToOne

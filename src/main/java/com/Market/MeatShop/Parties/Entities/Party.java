@@ -23,7 +23,12 @@ import java.util.List;
 public class Party {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "parties_seq_gen",
+            sequenceName = "parties_id_seq",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column(name = "party_name",nullable = false)

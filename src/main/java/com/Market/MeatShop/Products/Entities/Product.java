@@ -19,7 +19,12 @@ import java.util.List;
 @AllArgsConstructor
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "products_seq_gen",
+            sequenceName = "products_id_seq",
+            allocationSize = 1
+    )
     private long id;
 
     @Column(name = "product_name" , nullable = false , length = 255 , unique = true)
@@ -41,9 +46,9 @@ public class Product {
     private Category category;
 
     @OneToMany(fetch = FetchType.LAZY , mappedBy = "parentProduct")
-    private List<ProductComponent> compontents;
+    private List<ProductComponent> components;
 
-    @OneToMany(fetch = FetchType.LAZY , mappedBy = "component")
+    @OneToMany(fetch = FetchType.LAZY , mappedBy = "componentProduct")
     private List<ProductComponent> includedInComposition;
 
     @OneToMany(fetch = FetchType.LAZY , mappedBy = "product")

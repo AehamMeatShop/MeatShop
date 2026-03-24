@@ -18,7 +18,12 @@ import java.security.PrivateKey;
 @NoArgsConstructor
 public class ProductComponent {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "product_components_seq_gen",
+            sequenceName = "product_components_id_seq",
+            allocationSize = 1
+    )
     private long id;
 
     @ManyToOne
@@ -32,7 +37,7 @@ public class ProductComponent {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "component_id" , nullable = false)
-    private Product component;
+    private Product componentProduct;
 
 
 

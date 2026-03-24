@@ -16,7 +16,12 @@ import lombok.NoArgsConstructor;
 public class PartyContact {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "party_contacts_seq_gen",
+            sequenceName = "party_contacts_id_seq",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column(name = "method" , nullable = false)

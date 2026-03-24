@@ -22,7 +22,12 @@ import java.util.List;
 public class Invoice {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(
+            name = "invoices_seq_gen",
+            sequenceName = "invoices_id_seq",
+            allocationSize = 1
+    )
     private Long id;
 
     @Column( name = "invoice_type" , nullable = false )

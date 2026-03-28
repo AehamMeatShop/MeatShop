@@ -18,19 +18,5 @@ public record CreateProdCompsRequest(
         List<ComponentRatioDTO> components
 
 ) {
-        @AssertTrue(message = "components are not in right way")
-          private boolean isComponentsAreInRightWay(){
-                BigDecimal totalratio = new BigDecimal("0");
-                for(ComponentRatioDTO component : components){
-                  if(component.componentProductID().equals(parentProductId)){
-                    return false;
-                  }
-                  totalratio=totalratio.add(component.ratioInKg());
 
-                }
-
-
-            return totalratio.compareTo(BigDecimal.ONE) == 0;
-
-        }
 }

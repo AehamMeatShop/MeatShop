@@ -2,10 +2,7 @@ package com.Market.MeatShop.Shared;
 
 
 
-import com.Market.MeatShop.Shared.Exceptions.AlreadyHaveComponents;
-import com.Market.MeatShop.Shared.Exceptions.AlreadyHaveSame;
-import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
-import com.Market.MeatShop.Shared.Exceptions.TypeError;
+import com.Market.MeatShop.Shared.Exceptions.*;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -21,6 +18,19 @@ import java.time.LocalDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<?> handleIllegalStateException(IllegalStateException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                body( new ErrorResponse(ex.getMessage(), 400, LocalDateTime.now()));
+
+    }
+
+    @ExceptionHandler(RatioError.class)
+    public ResponseEntity<?> handleRatioError(RatioError ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new ErrorResponse(ex.getMessage(), 400, LocalDateTime.now()));
+    }
 
     @ExceptionHandler(AlreadyHaveComponents.class)
     public ResponseEntity<?> handleAlreadyHaveComponentsException(AlreadyHaveComponents ex) {

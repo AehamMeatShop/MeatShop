@@ -26,7 +26,7 @@ import java.util.List;
 public class ProductComponentService {
 
  private final ProductRepo productRepo;
- private ProductComponentRepo productComponentRepo;
+ private final ProductComponentRepo productComponentRepo;
  private final ProductComponentMapper productComponentMapper;
    public ProductComponentService(ProductRepo productRepo, ProductComponentRepo productComponentRepo,ProductComponentMapper productComponentMapper) {
        

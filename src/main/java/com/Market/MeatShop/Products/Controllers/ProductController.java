@@ -2,6 +2,7 @@ package com.Market.MeatShop.Products.Controllers;
 
 
 import com.Market.MeatShop.Products.DTOs.Requests.ProductCreateRequest;
+import com.Market.MeatShop.Products.DTOs.Requests.ProductFilterRequest;
 import com.Market.MeatShop.Products.DTOs.Requests.ProductUpdateRequest;
 import com.Market.MeatShop.Products.Services.ProductService;
 import jakarta.validation.Valid;
@@ -38,6 +39,10 @@ public class ProductController {
     public ResponseEntity<?> deleteProduct(@PathVariable long id){
         productService.deleteProduct(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+    @GetMapping("/filter")
+    public ResponseEntity<?> getProductsByCategory(ProductFilterRequest filter){
+      return ResponseEntity.status(HttpStatus.OK).body(productService.findAllbyCategoryId(filter));
     }
 
 }

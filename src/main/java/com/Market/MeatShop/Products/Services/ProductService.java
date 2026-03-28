@@ -2,6 +2,8 @@ package com.Market.MeatShop.Products.Services;
 
 import com.Market.MeatShop.Products.DTOs.ProductViewDTO;
 import com.Market.MeatShop.Products.DTOs.Requests.ProductCreateRequest;
+import com.Market.MeatShop.Products.DTOs.Requests.ProductFilterRequest;
+
 import com.Market.MeatShop.Products.DTOs.Requests.ProductUpdateRequest;
 import com.Market.MeatShop.Products.Entities.Category;
 import com.Market.MeatShop.Products.Entities.Product;
@@ -9,9 +11,12 @@ import com.Market.MeatShop.Products.Mappers.CategoryMapper;
 import com.Market.MeatShop.Products.Mappers.ProductMapper;
 import com.Market.MeatShop.Products.Repositories.CategoryRepo;
 import com.Market.MeatShop.Products.Repositories.ProductRepo;
+import com.Market.MeatShop.Products.Specifications.ProductSpecfications;
 import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +41,34 @@ public class ProductService {
         List<Product> products = productRepo.findAll();
         List<ProductViewDTO> productViewDTOList =productMapper.toProductViewDTOList(products);
         return productViewDTOList;
+    }
+
+    public List<ProductViewDTO> findAllbyCategoryId(ProductFilterRequest filter) {
+        Specification<Product> spec = Specification.allOf();
+          if(filter.productName()!=null){
+            spec=spec.and(ProductSpecfications.likeProductName(filter.productName()));
+          }
+          if(filter.productType()!=null){
+              spec=spec.and(ProductSpecfications.likeProductType(filter.productType()));
+
+          }
+          if(filter.description()!=null){
+              spec=spec.and(ProductSpecfications.likeDescription(filter.description()));
+          }
+          if(filter.createdAt()!=null){
+              spec=spec.and(ProductSpecfications.hasCreatedAt(filter.createdAt()));
+          }
+          if(filter.updatedAt()!=null){
+              spec=spec.and(ProductSpecfications.hasUpdatedAt(filter.updatedAt()));
+          }
+          if(filter.categoryId()!=null){
+
+              spec=spec.and(ProductSpecfications.hasCategoryId(filter.categoryId()));
+          }
+
+          List<Product> products=productRepo.findAll(spec);
+
+          return productMapper.toProductViewDTOList(products);
     }
 
     public ProductViewDTO createProduct(ProductCreateRequest productCreateRequest) {

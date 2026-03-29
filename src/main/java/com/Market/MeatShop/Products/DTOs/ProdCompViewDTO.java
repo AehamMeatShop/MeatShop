@@ -10,6 +10,8 @@ public record ProdCompViewDTO(
 
         String productName ,
 
+
+
         String description ,
 
         ProductTypes productType ,

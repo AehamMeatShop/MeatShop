@@ -44,8 +44,9 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
     @GetMapping("/filter")
-    public ResponseEntity<?> getProductsByCategory(@ModelAttribute ProductFilterRequest filter , Pageable pageable){
+    public ResponseEntity<?> getProductsByFilter(@ModelAttribute ProductFilterRequest filter , Pageable pageable){
       return ResponseEntity.status(HttpStatus.OK).body(productService.findAllbyFilter(filter , pageable));
     }
+
 
 }

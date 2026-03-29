@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 
@@ -34,6 +35,28 @@ public class ProductComponentService {
          this.productComponentRepo=productComponentRepo;
          this.productComponentMapper=productComponentMapper;
          }
+
+         public List<ProdCompViewDTO> findProdComps(long productId){
+             Optional<Product> optProduct = productRepo.findById(productId);
+             if (optProduct.isEmpty()) {
+                 throw new TargetNotFound("Product : " + productId + "not found");
+             }
+             Product product = optProduct.get();
+             if(!product.getProductType().equals(ProductTypes.COMPOSITE)){
+                 throw new TypeError("Product Type is not COMPOSITE");
+             }
+
+             List<ProductComponent> prodComps=productComponentRepo.findByParentProductId(productId);
+
+             if(prodComps.isEmpty()){
+                 throw new TargetNotFound("Product doesn't have Components ! ");
+             }
+
+             return productComponentMapper.toViewDTOList(prodComps);
+
+         }
+
+
 
          @Transactional
          public List<ProdCompViewDTO> createProductComponentList(CreateProdCompsRequest createProdCompsRequest) {

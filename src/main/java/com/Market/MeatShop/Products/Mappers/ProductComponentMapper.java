@@ -6,11 +6,19 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface ProductComponentMapper {
     @Mapping(source = "componentProduct.productName", target = "productName")
     @Mapping(source = "componentProduct.description", target = "description")
     @Mapping(source = "componentProduct.productType", target = "productType")
-    public ProdCompViewDTO toViewDTO(ProductComponent productComponent);
+    ProdCompViewDTO toViewDTO(ProductComponent productComponent);
+
+    @Mapping(source = "componentProduct.productName", target = "productName")
+    @Mapping(source = "componentProduct.description", target = "description")
+    @Mapping(source = "componentProduct.productType", target = "productType")
+    List<ProdCompViewDTO> toViewDTOList(List<ProductComponent> productComponents);
+
 
 }

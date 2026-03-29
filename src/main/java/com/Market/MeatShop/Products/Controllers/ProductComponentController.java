@@ -17,6 +17,11 @@ public class ProductComponentController {
         this.productComponentService = productComponentService;
     }
 
+    @GetMapping("/product/{id}")
+    public ResponseEntity<?> getProdCompsById(@PathVariable long id){
+        return ResponseEntity.status(HttpStatus.OK).body(productComponentService.findProdComps(id));
+    }
+
     @PostMapping
     public ResponseEntity<?> createProductComponent(@Valid @RequestBody CreateProdCompsRequest createProdCompsRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productComponentService.createProductComponentList(createProdCompsRequest));

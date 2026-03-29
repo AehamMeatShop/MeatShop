@@ -9,15 +9,18 @@ import com.Market.MeatShop.Products.Entities.Category;
 import com.Market.MeatShop.Products.Entities.Product;
 import com.Market.MeatShop.Products.Mappers.CategoryMapper;
 import com.Market.MeatShop.Products.Mappers.ProductMapper;
+import com.Market.MeatShop.Products.QueryRoles.ProductQueryRoles;
 import com.Market.MeatShop.Products.Repositories.CategoryRepo;
 import com.Market.MeatShop.Products.Repositories.ProductRepo;
 import com.Market.MeatShop.Products.Specifications.ProductSpecfications;
 import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
+
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +46,18 @@ public class ProductService {
         return productViewDTOList;
     }
 
-    public List<ProductViewDTO> findAllbyCategoryId(ProductFilterRequest filter) {
+    public Page<ProductViewDTO> findAllbyFilter(ProductFilterRequest filter , Pageable pageable) {
+
+        pageable.getSort().forEach(sort -> {
+           if(!ProductQueryRoles.ALLOWED_SORT_FIELDS.contains(sort.getProperty())){
+               throw new IllegalArgumentException(
+                       "Sorting not allowed on: " + sort.getProperty()
+               );
+           }
+        });
+        if(pageable.getPageSize() > ProductQueryRoles.maxPageSize){
+            throw new IllegalArgumentException("Page size is greater than " + ProductQueryRoles.maxPageSize);
+        }
         Specification<Product> spec = Specification.allOf();
           if(filter.productName()!=null){
             spec=spec.and(ProductSpecfications.likeProductName(filter.productName()));
@@ -66,9 +80,9 @@ public class ProductService {
               spec=spec.and(ProductSpecfications.hasCategoryId(filter.categoryId()));
           }
 
-          List<Product> products=productRepo.findAll(spec);
+          Page<Product> products=productRepo.findAll(spec , pageable);
 
-          return productMapper.toProductViewDTOList(products);
+          return products.map(productMapper::toProductViewDTO);
     }
 
     public ProductViewDTO createProduct(ProductCreateRequest productCreateRequest) {

@@ -19,10 +19,16 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                body( new ErrorResponse("bad arguments", 400, LocalDateTime.now()));
+    }
+
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<?> handleIllegalStateException(IllegalStateException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).
-                body( new ErrorResponse(ex.getMessage(), 400, LocalDateTime.now()));
+                body( new ErrorResponse("wrong state ", 400, LocalDateTime.now()));
 
     }
 

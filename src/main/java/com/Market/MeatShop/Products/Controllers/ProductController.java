@@ -6,9 +6,12 @@ import com.Market.MeatShop.Products.DTOs.Requests.ProductFilterRequest;
 import com.Market.MeatShop.Products.DTOs.Requests.ProductUpdateRequest;
 import com.Market.MeatShop.Products.Services.ProductService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+
 
 @RestController
 @RequestMapping("/products")
@@ -41,8 +44,8 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
     @GetMapping("/filter")
-    public ResponseEntity<?> getProductsByCategory(ProductFilterRequest filter){
-      return ResponseEntity.status(HttpStatus.OK).body(productService.findAllbyCategoryId(filter));
+    public ResponseEntity<?> getProductsByCategory(@ModelAttribute ProductFilterRequest filter , Pageable pageable){
+      return ResponseEntity.status(HttpStatus.OK).body(productService.findAllbyFilter(filter , pageable));
     }
 
 }

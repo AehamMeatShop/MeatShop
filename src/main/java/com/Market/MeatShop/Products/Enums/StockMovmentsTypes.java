@@ -7,5 +7,5 @@ public enum StockMovmentsTypes {
     ,TRANSFER // move the products from placa to another now is not important
     ,TRANSFORM // convert the product to another as separate the meat and bons
     ,WASTE // expired meat and same cases
-    ,SHRINKAGE // solve the drying and lose the weight with the time and minimal quantity wit sell
+    ,SHRINKAGE // solve the drying and lose the weight with the time and minimal quantity with sell
 }

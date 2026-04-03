@@ -3,6 +3,7 @@ package com.Market.MeatShop.Products.DTOs.Requests;
 import com.Market.MeatShop.Products.Enums.StockMovementsTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,12 +18,14 @@ import lombok.NoArgsConstructor;
         visible = true
 )
 @JsonSubTypes(value = {
-        @JsonSubTypes.Type(value = AdjProdStockReq.class, name = "ADJUSTMENT"),
-        @JsonSubTypes.Type(value = WastProdStockReq.class, name = "WASTE")
+        @JsonSubTypes.Type(value = AdjProdStockReq.class, name= "ADJUSTMENT"),
+        @JsonSubTypes.Type(value = WastShrinkageProdStockReq.class, names = {"WASTE" , "SHRINKAGE"}),
+        @JsonSubTypes.Type(value = SellProdStockReq.class, name = "SELL"),
+        @JsonSubTypes.Type(value = PurchaseProdStockReq.class, name = "PURCHASE")
 })
 public abstract class BaseStockMoveReq {
 
-
-   protected String type ;
+   @NotNull
+   protected StockMovementsTypes type ;
    protected String notes ;
 }

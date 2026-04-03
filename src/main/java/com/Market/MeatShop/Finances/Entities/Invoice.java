@@ -34,9 +34,9 @@ public class Invoice {
     @Enumerated(EnumType.STRING)
     InvoiceType invoiceType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "party_id" , nullable = false)
-    private Party party;
+
+    @Column(name = "party_id" , nullable = false)
+    private Long partyId;
 
     @Column(name = "notes" , nullable = true ,length = 1023)
     private String notes;

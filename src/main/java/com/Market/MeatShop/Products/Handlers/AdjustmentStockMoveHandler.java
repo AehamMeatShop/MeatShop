@@ -15,10 +15,9 @@ public class AdjustmentStockMoveHandler extends StockMovementHandler{
     }
 
     @Override
-public boolean canHandle(String type){
+public boolean canHandle(StockMovementsTypes type){
 
-
-            return StockMovementsTypes.valueOf(type) == StockMovementsTypes.ADJUSTMENT;
+ return type == StockMovementsTypes.ADJUSTMENT;
 
 }
 public StockMoveViewDTO handle(BaseStockMoveReq req){

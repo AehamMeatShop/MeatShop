@@ -9,8 +9,7 @@ CREATE TABLE stock_movments (
    stock_movment_type VARCHAR(255) NOT NULL ,
    notes varchar(1023) NULL ,
 
-    CONSTRAINT fk_product_stock_movment FOREIGN KEY(product_id) REFERENCES products(id),
-    CONSTRAINT fk_inv_component_stock_move FOREIGN KEY (invoice_component_id) REFERENCES invoice_components(id)
+    CONSTRAINT fk_product_stock_movment FOREIGN KEY(product_id) REFERENCES products(id)
 );
 
 CREATE INDEX idx_stock_move_product_id ON stock_movments(product_id);

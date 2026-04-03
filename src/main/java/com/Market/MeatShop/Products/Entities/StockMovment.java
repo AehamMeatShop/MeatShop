@@ -41,9 +41,9 @@ public class StockMovment {
     @UpdateTimestamp
     LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "invoice_component_id", nullable = true)
-    private InvoiceComponent invoiceComponent;
+
+    @Column(name = "invoice_component_id", nullable = true)
+    private Long invoiceComponentId;
 
     @Column(name = "quantity" , nullable = false)
     private BigDecimal quantity;

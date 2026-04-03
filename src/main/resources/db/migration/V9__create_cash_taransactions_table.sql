@@ -12,7 +12,7 @@ CREATE TABLE cash_transactions (
 
     invoice_id BIGINT ,
 
-    CONSTRAINT fk_party_cash_transactions FOREIGN KEY(party_id) REFERENCES parties(id) ,
+
     CONSTRAINT fk_invoice_cash_transaction FOREIGN KEY (invoice_id) REFERENCES invoices(id)
 
 );

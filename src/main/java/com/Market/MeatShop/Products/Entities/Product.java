@@ -54,8 +54,6 @@ public class Product {
     @OneToMany(fetch = FetchType.LAZY , mappedBy = "product")
     private List<StockMovment> stockMovements;
 
-    @OneToMany(  fetch = FetchType.LAZY ,  mappedBy = "product" )
-    private List<InvoiceComponent> invoicesComponents;
 
     @Column(name = "product_type" ,nullable = false)
     @Enumerated(EnumType.STRING)

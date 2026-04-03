@@ -34,9 +34,9 @@ public class Employee {
     @DecimalMin(value = "0" )
     private long salary;
 
-    @OneToOne
-    @JoinColumn(name = "party_id" , nullable = false)
-    private Party party;
+
+    @Column(name = "party_id" , nullable = false)
+    private Long partyId;
 
     @CreationTimestamp
     @Column( name = "created_at",nullable = false ,updatable = false)

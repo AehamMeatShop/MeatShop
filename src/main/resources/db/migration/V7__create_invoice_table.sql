@@ -6,9 +6,9 @@ CREATE TABLE invoices(
     party_id BIGINT NOT NULL ,
     notes VARCHAR(1023) NULL ,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 
-    CONSTRAINT fk_invoices_of_party FOREIGN KEY (party_id) REFERENCES parties(id)
+
 
 );
 

@@ -40,17 +40,10 @@ public class Party {
     @OneToMany(mappedBy = "party" , fetch = FetchType.EAGER)
     List<PartyContact> partyContacts;
 
-    @OneToMany(mappedBy = "party" , fetch = FetchType.LAZY)
-    List<Invoice> invoices;
-
-    @OneToMany(mappedBy = "party")
-    List<CashTransaction> cashTransactions;
 
     @Column(name = "party_type" , nullable = false )
-
     @Enumerated(EnumType.STRING )
     PartyType  partyType;
 
-    @OneToOne(mappedBy = "party")
-    private Employee employee;
+
 }

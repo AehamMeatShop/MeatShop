@@ -28,6 +28,7 @@ public class StockMovementController {
 
     @PostMapping("")
     public ResponseEntity<?> adjustmentProdStock2(@Valid @RequestBody BaseStockMoveReq req){
+
         StockMovementHandler handler = stockMovementHandlers.stream()
                 .filter(h -> h.canHandle(req.getType()))
                 .findFirst()

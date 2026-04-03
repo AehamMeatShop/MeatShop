@@ -1,8 +1,6 @@
 package com.Market.MeatShop.Finances.Entities;
 
 
-import com.Market.MeatShop.Products.Entities.Product;
-import com.Market.MeatShop.Products.Entities.StockMovment;
 import jakarta.persistence.*;
 
 import jakarta.validation.constraints.DecimalMin;
@@ -11,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.List;
+
 
 
 @Table(name= "invoice_components")
@@ -30,9 +28,9 @@ public class InvoiceComponent {
     )
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id" , nullable = false)
-    private Product product;
+
+    @Column(name = "product_id" , nullable = false)
+    private Long productId;
 
     @Column(name = "quantity_kg" , nullable = false )
     @DecimalMin(value = "0.001" , message = "quantity at least 1 gram = 0.001 kg")
@@ -45,8 +43,7 @@ public class InvoiceComponent {
     @JoinColumn(name = "invoice_id", nullable = false)
     private Invoice invoice;
 
-    @OneToMany(mappedBy = "invoiceComponent" , fetch = FetchType.LAZY)
-    private List<StockMovment> stockMovments;
+
 
 
 

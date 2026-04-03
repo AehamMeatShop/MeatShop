@@ -9,9 +9,9 @@ CREATE TABLE invoice_components (
 
    invoice_id BIGINT NOT NULL ,
 
-    CONSTRAINT fk_invoice_components FOREIGN KEY (invoice_id) REFERENCES invoices(id),
+    CONSTRAINT fk_invoice_components FOREIGN KEY (invoice_id) REFERENCES invoices(id)
 
-    CONSTRAINT fk_product_invoice_component FOREIGN KEY (product_id) REFERENCES products(id)
+
 
 );
 

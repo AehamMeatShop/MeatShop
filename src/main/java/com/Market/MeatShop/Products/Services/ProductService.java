@@ -134,6 +134,12 @@ public class ProductService {
 
     }
 
-
+    public Product getProduct(Long id){
+        Optional<Product> product = productRepo.findById(id);
+        if(product.isEmpty() ){
+            throw new TargetNotFound("Product : " +id+ " not found");
+        }
+        return product.get();
+    }
 
 }

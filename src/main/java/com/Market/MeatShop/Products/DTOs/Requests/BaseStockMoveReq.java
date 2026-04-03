@@ -1,5 +1,6 @@
 package com.Market.MeatShop.Products.DTOs.Requests;
 
+import com.Market.MeatShop.Products.Enums.StockMovementsTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.AllArgsConstructor;
@@ -15,9 +16,9 @@ import lombok.NoArgsConstructor;
         property = "type" ,
         visible = true
 )
-@JsonSubTypes({
+@JsonSubTypes(value = {
         @JsonSubTypes.Type(value = AdjProdStockReq.class, name = "ADJUSTMENT"),
-        @JsonSubTypes.Type(value = WastProdStockReq.class, name = "WAST")
+        @JsonSubTypes.Type(value = WastProdStockReq.class, name = "WASTE")
 })
 public abstract class BaseStockMoveReq {
 

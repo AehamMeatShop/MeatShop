@@ -1,7 +1,7 @@
 package com.Market.MeatShop.Products.Entities;
 
 import com.Market.MeatShop.Finances.Entities.InvoiceComponent;
-import com.Market.MeatShop.Products.Enums.StockMovmentsTypes;
+import com.Market.MeatShop.Products.Enums.StockMovementsTypes;
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -50,7 +50,7 @@ public class StockMovment {
 
     @Column(name = "stock_movment_type" , nullable = false)
     @Enumerated(EnumType.STRING)
-    private StockMovmentsTypes stockMovmentsType;
+    private StockMovementsTypes stockMovementsType;
 
     @Column(name = "notes" , nullable = true , length = 1023)
     private String notes;

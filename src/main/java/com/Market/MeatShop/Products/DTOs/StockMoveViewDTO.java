@@ -1,11 +1,6 @@
 package com.Market.MeatShop.Products.DTOs;
 
-import com.Market.MeatShop.Finances.Entities.InvoiceComponent;
-import com.Market.MeatShop.Products.Entities.Product;
-import com.Market.MeatShop.Products.Enums.StockMovmentsTypes;
-import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import com.Market.MeatShop.Products.Enums.StockMovementsTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,7 +19,7 @@ public record StockMoveViewDTO(
 
      BigDecimal quantity,
 
-     StockMovmentsTypes stockMovmentsType,
+     StockMovementsTypes stockMovementsType,
 
      String notes
 

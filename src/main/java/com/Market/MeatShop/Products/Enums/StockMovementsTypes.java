@@ -1,6 +1,6 @@
 package com.Market.MeatShop.Products.Enums;
 
-public enum StockMovmentsTypes {
+public enum StockMovementsTypes {
      PURCHASE
     ,SELL
     ,ADJUSTMENT // to solve the problem of wasted weight without clear cause

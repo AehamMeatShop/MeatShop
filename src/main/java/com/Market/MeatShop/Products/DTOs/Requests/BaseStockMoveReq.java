@@ -21,7 +21,8 @@ import lombok.NoArgsConstructor;
         @JsonSubTypes.Type(value = AdjProdStockReq.class, name= "ADJUSTMENT"),
         @JsonSubTypes.Type(value = WastShrinkageProdStockReq.class, names = {"WASTE" , "SHRINKAGE"}),
         @JsonSubTypes.Type(value = SellProdStockReq.class, name = "SELL"),
-        @JsonSubTypes.Type(value = PurchaseProdStockReq.class, name = "PURCHASE")
+        @JsonSubTypes.Type(value = PurchaseProdStockReq.class, name = "PURCHASE"),
+        @JsonSubTypes.Type(value = TransformProdStockReq.class, name = "TRANSFORM")
 })
 public abstract class BaseStockMoveReq {
 

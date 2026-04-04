@@ -1,9 +1,6 @@
 package com.Market.MeatShop.Products.Services;
 
-import com.Market.MeatShop.Products.DTOs.Requests.AdjProdStockReq;
-import com.Market.MeatShop.Products.DTOs.Requests.PurchaseProdStockReq;
-import com.Market.MeatShop.Products.DTOs.Requests.SellProdStockReq;
-import com.Market.MeatShop.Products.DTOs.Requests.WastShrinkageProdStockReq;
+import com.Market.MeatShop.Products.DTOs.Requests.*;
 import com.Market.MeatShop.Products.DTOs.StockMoveViewDTO;
 import com.Market.MeatShop.Products.Entities.Product;
 import com.Market.MeatShop.Products.Entities.ProductComponent;
@@ -22,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class StockMovementService {
@@ -77,7 +75,7 @@ public class StockMovementService {
         else if(req.getQuantity().compareTo(BigDecimal.ZERO) < 0){
 
             BigDecimal currentStock = stockMovementRepo.getCurrentStock(req.getProductId());
-            BigDecimal temporalQuantity=req.getQuantity().multiply(BigDecimal.valueOf(-1));
+            BigDecimal temporalQuantity=req.getQuantity().negate()  ;
             if(temporalQuantity.compareTo(currentStock) > 0){
                 throw new QuantityIsNotRegular("the quantity is greater than the exists stock of product");
             }
@@ -104,7 +102,7 @@ public class StockMovementService {
         }
 
 
-      return createStockMovement(product , req.getQuantity().multiply(BigDecimal.valueOf(-1)) , req.getNotes() ,null,req.getType());
+      return createStockMovement(product , req.getQuantity().negate()   , req.getNotes() ,null,req.getType());
 
     }
     @Transactional
@@ -124,7 +122,7 @@ public class StockMovementService {
                     throw new IllegalArgumentException("the sold quantity in prepare sell of prod: " +prodComp.getId() +" cannot be greater than the exists stock of product : " + currentStock);
                 }
                 temporalQuantity = temporalQuantity.subtract(quantityOfComp);
-                resp.add(createStockMovement(prodComp, quantityOfComp.multiply(BigDecimal.valueOf(-1)), req.getNotes(), req.getComponentId(), StockMovementsTypes.SELL));
+                resp.add(createStockMovement(prodComp, quantityOfComp.negate()  , req.getNotes(), req.getComponentId(), StockMovementsTypes.SELL));
             }
         }
         return temporalQuantity;
@@ -148,7 +146,7 @@ public class StockMovementService {
             if (req.getQuantity().compareTo(currentStock) > 0) {
                 throw new IllegalArgumentException("the sold quantity cannot be greater than the exists stock of product : " + currentStock);
             }
-           resp.add(createStockMovement(product, req.getQuantity().multiply(BigDecimal.valueOf(-1)), req.getNotes(), req.getComponentId(), StockMovementsTypes.SELL));
+           resp.add(createStockMovement(product, req.getQuantity().negate()  , req.getNotes(), req.getComponentId(), StockMovementsTypes.SELL));
 
         }
         else if(req.getBehavior() == SellBehavior.PREPARE) {
@@ -165,7 +163,7 @@ public class StockMovementService {
             BigDecimal reminderQuantity;
 
             if (req.getQuantity().compareTo(currentStock) <= 0) {
-                resp.add(createStockMovement(product, currentStock.multiply(BigDecimal.valueOf(-1)), req.getNotes(), null, StockMovementsTypes.SELL));
+                resp.add(createStockMovement(product, currentStock.negate()  , req.getNotes(), null, StockMovementsTypes.SELL));
             }
 
 
@@ -193,6 +191,25 @@ public class StockMovementService {
         return createStockMovement(product , req.getQuantity() ,req.getNotes(), req.getComponentId(), StockMovementsTypes.PURCHASE);
     }
 
+    public List<StockMoveViewDTO> transformProductStock(TransformProdStockReq req) {
+        List<StockMoveViewDTO> resp = new ArrayList<>();
+       for(Map.Entry<Long , BigDecimal> inputEntry: req.getInputs().entrySet()){
+           Product product = productService.getProduct(inputEntry.getKey());
+
+           BigDecimal currentStock = getCurrentStockOfProd(inputEntry.getKey()).get("currentStock");
+           if(product.getProductType()!= ProductTypes.SERVICE) {
+               if (inputEntry.getValue().compareTo(currentStock) > 0) {
+                   throw new IllegalArgumentException("the sold quantity cannot be greater than the current stock of product :  " + inputEntry.getKey() + ": " + inputEntry.getValue());
+               }
+           }
+         resp.add(createStockMovement(product , inputEntry.getValue().negate() , req.getNotes(), null, StockMovementsTypes.TRANSFORM));
+       }
+        for(Map.Entry<Long , BigDecimal> outputEntry: req.getOutputs().entrySet()){
+            Product product = productService.getProduct(outputEntry.getKey());
+            resp.add(createStockMovement(product ,outputEntry.getValue() , req.getNotes(), null, StockMovementsTypes.TRANSFORM));
+        }
+      return resp;
+    }
 
 
 

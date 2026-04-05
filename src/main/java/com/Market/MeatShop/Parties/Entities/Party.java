@@ -9,8 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -44,6 +47,14 @@ public class Party {
     @Column(name = "party_type" , nullable = false )
     @Enumerated(EnumType.STRING )
     PartyType  partyType;
+
+    @CreationTimestamp
+    @Column(name = "created_at" , nullable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at" , nullable = true)
+    private LocalDateTime updatedAt;
 
 
 }

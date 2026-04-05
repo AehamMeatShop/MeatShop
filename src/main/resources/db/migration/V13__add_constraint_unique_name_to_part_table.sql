@@ -1,0 +1,1 @@
+ALTER TABLE parties ADD CONSTRAINT unique_party_name UNIQUE (party_name)

@@ -1,0 +1,10 @@
+ALTER TABLE parties add column  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE parties add column   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE party_contacts add column  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE party_contacts add column  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+
+ALTER TABLE invoice_components add column created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE invoice_components add column updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+

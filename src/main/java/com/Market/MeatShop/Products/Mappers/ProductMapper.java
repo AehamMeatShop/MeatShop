@@ -30,4 +30,5 @@ public interface ProductMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromRequest(ProductUpdateRequest productUpdateRequest, @MappingTarget Product product);
 
+    Product clone(Product product);
 }

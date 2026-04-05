@@ -51,6 +51,10 @@ public class CategoryService {
 
            Category updateCategory= category.get();
            categoryMapper.updateFromRequest(categoryCreateRequest , updateCategory );
+           Category orginalCopy = categoryMapper.clone(updateCategory);
+           if(orginalCopy.equals(category.get())){
+               throw new IllegalArgumentException("no changes");
+           }
            categoryRepo.saveAndFlush(updateCategory);
            return categoryMapper.toCategoryViewDTO(updateCategory);
        }

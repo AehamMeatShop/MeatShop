@@ -6,10 +6,13 @@ import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.math.BigDecimal;
 import java.security.PrivateKey;
+import java.time.LocalDateTime;
 
 @Table(name= "product_components")
 @Entity
@@ -39,7 +42,13 @@ public class ProductComponent {
     @JoinColumn(name = "component_id" , nullable = false)
     private Product componentProduct;
 
+    @CreationTimestamp
+    @Column(name = "created_at" , nullable = false)
+    private LocalDateTime createdAt;
 
+    @UpdateTimestamp
+    @Column(name = "updated_at" , nullable = true)
+    private LocalDateTime updatedAt;
 
 
 }

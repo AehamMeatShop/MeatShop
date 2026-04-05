@@ -7,9 +7,11 @@ import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
-
+import java.time.LocalDateTime;
 
 
 @Table(name= "invoice_components")
@@ -44,7 +46,13 @@ public class InvoiceComponent {
     private Invoice invoice;
 
 
+    @CreationTimestamp
+    @Column(name = "created_at" , nullable = false)
+    private LocalDateTime createdAt;
 
+    @UpdateTimestamp
+    @Column(name = "updated_at" , nullable = true)
+    private LocalDateTime updatedAt;
 
 
 }

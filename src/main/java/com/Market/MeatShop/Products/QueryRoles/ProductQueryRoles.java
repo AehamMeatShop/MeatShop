@@ -1,9 +1,6 @@
 package com.Market.MeatShop.Products.QueryRoles;
 
-import com.Market.MeatShop.Products.Enums.ProductTypes;
-import jdk.dynalink.beans.StaticClass;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class ProductQueryRoles {

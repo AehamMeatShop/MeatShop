@@ -1,6 +1,7 @@
 package com.Market.MeatShop.Products.Mappers;
 
 import com.Market.MeatShop.Products.DTOs.ProdCompViewDTO;
+import com.Market.MeatShop.Products.Entities.Product;
 import com.Market.MeatShop.Products.Entities.ProductComponent;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,5 +21,5 @@ public interface ProductComponentMapper {
     @Mapping(source = "componentProduct.productType", target = "productType")
     List<ProdCompViewDTO> toViewDTOList(List<ProductComponent> productComponents);
 
-
+     ProductComponent clone(ProductComponent productComponent);
 }

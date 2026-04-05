@@ -110,7 +110,10 @@ public class ProductService {
                .orElseThrow(() -> new TargetNotFound("Product Id : " + id));
 
        productMapper.updateFromRequest( productUpdateRequest,product);
-
+       Product originalCopy =productMapper.clone(product);
+       if(originalCopy.equals(product)){
+           throw new IllegalArgumentException("no changes");
+       }
        if(productUpdateRequest.categoryId() != null ) {
 
            Category category = categoryRepo.findById(productUpdateRequest.categoryId())

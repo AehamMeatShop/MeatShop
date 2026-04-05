@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 
 @Table(name= "party_contacts"  ,uniqueConstraints = @UniqueConstraint(columnNames = {"method", "identifier"}))
@@ -33,5 +37,13 @@ public class PartyContact {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "party_id" , nullable = false)
     private Party party;
+
+    @CreationTimestamp
+    @Column(name = "created_at" , nullable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at" , nullable = true)
+    private LocalDateTime updatedAt;
 
 }

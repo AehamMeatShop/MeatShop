@@ -18,6 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PartyService {
@@ -33,7 +34,19 @@ public class PartyService {
        return partyMapper.toViewDTO(partyRepo.save(partyMapper.toEntity(req)));
 
    }
+    public PartyViewDTO findPartyById(long id) {
+        Party party=findPartyByIdEn(id);
+        return partyMapper.toViewDTO(party);
 
+    }
+    public Party findPartyByIdEn(long id) {
+        Optional<Party> party =  partyRepo.findById(id);
+        if(party.isEmpty()){
+            throw new TargetNotFound("party : "+id+" not found");
+        }
+        return party.get();
+
+    }
    public Page<PartyViewDTO> findByFilter(PartyFilterReq filter, Pageable pageable) {
        pageable.getSort().forEach(sort -> {
            if(!PartyQueryRoles.ALLOWED_SORT_FIELDS.contains(sort.getProperty())){
@@ -67,7 +80,8 @@ public class PartyService {
 
    }
    public PartyViewDTO updateParty(UpdatePartyReq req, Long id){
-      Party party= partyRepo.findById(id).orElseThrow(() ->new TargetNotFound("party : "+id+"not found"));
+
+       Party party=findPartyByIdEn(id);
       Party orginalCopy=partyMapper.clone(party);
       party=partyMapper.fromUpdateReq(req , party);
       if(orginalCopy.equals(party)){
@@ -75,5 +89,9 @@ public class PartyService {
       }
       party= partyRepo.save(party);
        return  partyMapper.toViewDTO(party);
+   }
+   public void deleteParty(Long id){
+       findPartyByIdEn(id);
+       partyRepo.deleteById(id);
    }
 }

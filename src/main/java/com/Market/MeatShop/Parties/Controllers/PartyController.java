@@ -29,10 +29,21 @@ public class PartyController {
     public ResponseEntity<?> getPartyByFilter(PartyFilterReq req , Pageable pageable){
      return ResponseEntity.status(HttpStatus.OK).body(partyService.findByFilter(req , pageable));
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getPartyById(@PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK).body(partyService.findPartyById(id));
+    }
     @PutMapping("/{id}")
     public ResponseEntity<?> updateParty(@PathVariable Long id, @RequestBody UpdatePartyReq req){
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(partyService.updateParty(req , id));
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteParty(@PathVariable Long id){
+         partyService.deleteParty(id);
+         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+
 
     
 }

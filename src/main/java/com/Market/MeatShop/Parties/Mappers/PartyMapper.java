@@ -9,9 +9,7 @@ import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.springframework.data.domain.Page;
 
-import java.lang.annotation.Target;
 import java.util.List;
 
 @Mapper(componentModel = "spring")

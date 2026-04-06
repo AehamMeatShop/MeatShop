@@ -40,7 +40,7 @@ public class Party {
     @Column( name = "party_address",nullable = false , length = 1023)
     private String partyAddress;
 
-    @OneToMany(mappedBy = "party" , fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "party" , fetch = FetchType.LAZY)
     List<PartyContact> partyContacts;
 
 

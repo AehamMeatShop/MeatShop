@@ -34,7 +34,7 @@ public class PartyContact {
     @Column(name = "identifier" , nullable = false)
     private String identifier;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "party_id" , nullable = false)
     private Party party;
 

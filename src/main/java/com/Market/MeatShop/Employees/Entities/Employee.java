@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +30,13 @@ public class Employee {
             allocationSize = 1
     )
     private Long id;
+
+    @Column(name = "email" ,unique = true , nullable = false , length = 100 )
+    private String email;
+    @Column( name = "password",length = 100 , nullable = false  )
+    @Length(max = 100 , min = 8)
+    private String password;
+
 
     @Column(name = "salary" , nullable = false)
     @DecimalMin(value = "0" )

@@ -18,10 +18,11 @@ public record PartyViewDTO(
 
          String partyAddress,
 
+        PartyType partyType,
 
-        List<PartyContactViewDTO> partyContacts,
+        List<PartyContactViewDTO> partyContacts
 
 
-        PartyType partyType
+
 ) {
 }

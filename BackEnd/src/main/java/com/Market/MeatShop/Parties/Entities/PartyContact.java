@@ -23,8 +23,8 @@ public class PartyContact {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(
             name = "party_contacts_seq_gen",
-            sequenceName = "party_contacts_id_seq",
-            allocationSize = 1
+            sequenceName = "party_contacts_seq",
+            allocationSize = 50
     )
     private Long id;
 

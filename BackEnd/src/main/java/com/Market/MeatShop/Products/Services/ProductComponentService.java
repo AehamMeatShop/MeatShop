@@ -1,6 +1,5 @@
 package com.Market.MeatShop.Products.Services;
 
-
 import com.Market.MeatShop.Products.DTOs.ComponentRatioDTO;
 import com.Market.MeatShop.Products.DTOs.ProdCompViewDTO;
 import com.Market.MeatShop.Products.DTOs.Requests.CreateProdCompsRequest;
@@ -15,6 +14,7 @@ import com.Market.MeatShop.Shared.Exceptions.RatioError;
 import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
 import com.Market.MeatShop.Shared.Exceptions.TypeError;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -23,104 +23,137 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-
+@Slf4j
 public class ProductComponentService {
 
- private final ProductRepo productRepo;
- private final ProductComponentRepo productComponentRepo;
- private final ProductComponentMapper productComponentMapper;
-   public ProductComponentService(ProductRepo productRepo, ProductComponentRepo productComponentRepo,ProductComponentMapper productComponentMapper) {
-       
-         this.productRepo=productRepo;
-         this.productComponentRepo=productComponentRepo;
-         this.productComponentMapper=productComponentMapper;
-         }
+  private final ProductRepo productRepo;
+  private final ProductComponentRepo productComponentRepo;
+  private final ProductComponentMapper productComponentMapper;
 
-         public List<ProdCompViewDTO> findProdComps(long productId){
-             Optional<Product> optProduct = productRepo.findById(productId);
-             if (optProduct.isEmpty()) {
-                 throw new TargetNotFound("Product : " + productId + "not found");
-             }
-             Product product = optProduct.get();
-             if(!product.getProductType().equals(ProductTypes.COMPOSITE)){
-                 throw new TypeError("Product Type is not COMPOSITE");
-             }
+  public ProductComponentService(
+      ProductRepo productRepo,
+      ProductComponentRepo productComponentRepo,
+      ProductComponentMapper productComponentMapper) {
 
-             List<ProductComponent> prodComps=productComponentRepo.findByParentProductId(productId);
+    this.productRepo = productRepo;
+    this.productComponentRepo = productComponentRepo;
+    this.productComponentMapper = productComponentMapper;
+  }
 
-             if(prodComps.isEmpty()){
-                 throw new TargetNotFound("Product doesn't have Components ! ");
-             }
-
-             return productComponentMapper.toViewDTOList(prodComps);
-
-         }
-
-    public List<ProductComponent> findProdCompsToSys(long productId){
-        Optional<Product> optProduct = productRepo.findById(productId);
-        if (optProduct.isEmpty()) {
-            throw new TargetNotFound("Product : " + productId + "not found");
-        }
-        Product product = optProduct.get();
-        if(!product.getProductType().equals(ProductTypes.COMPOSITE)){
-            throw new TypeError("Product Type is not COMPOSITE");
-        }
-
-        List<ProductComponent> prodComps=productComponentRepo.findByParentProductId(productId);
-
-        if(prodComps.isEmpty()){
-            throw new TargetNotFound("Product doesn't have Components ! ");
-        }
-
-        return prodComps;
-
+  public List<ProdCompViewDTO> findProdComps(long productId) {
+    Optional<Product> optProduct = productRepo.findById(productId);
+    if (optProduct.isEmpty()) {
+      throw new TargetNotFound("Product : " + productId + "not found");
+    }
+    Product product = optProduct.get();
+    if (!product.getProductType().equals(ProductTypes.COMPOSITE)) {
+      throw new TypeError("Product Type is not COMPOSITE");
     }
 
-         @Transactional
-         public List<ProdCompViewDTO> createProductComponentList(CreateProdCompsRequest createProdCompsRequest) {
-             List<ProdCompViewDTO>  response = new ArrayList<>();
-          Product parentProduct = productRepo.findByIdWithComponents(createProdCompsRequest.parentProductId()).
-                  orElseThrow (() ->  new TargetNotFound("the product : " +  createProdCompsRequest.parentProductId() + " doesn't exist"));
-         if(!parentProduct.getProductType().equals(ProductTypes.COMPOSITE) ){
-           throw new TypeError("the product type is not COMPOSITE");
-         }
-             if (!parentProduct.getComponents().isEmpty()) {
-                 throw new AlreadyHaveComponents("the product already have components, if you want edit delete them then enter the new components!");
-             }
+    List<ProductComponent> prodComps = productComponentRepo.findByParentProductId(productId);
 
-          List<ComponentRatioDTO> compRatios  = createProdCompsRequest.components();
-             BigDecimal totalratio = new BigDecimal("0");
-          for (ComponentRatioDTO compRatio : compRatios) {
-              Product componentProduct = productRepo.findById(compRatio.componentProductID())
-                      .orElseThrow(() -> new TargetNotFound("the product component : " +  compRatio.componentProductID() + " doesn't exist"));
-              if (componentProduct.getProductType().equals(ProductTypes.COMPOSITE)) {
-                  throw new TypeError("the components type mostn't be COMPOSITE");
-              }
-              if(componentProduct.getProductType().equals(ProductTypes.SIMPLE)){
-                  totalratio=totalratio.add(compRatio.ratioInKg());
-              }
-                   ProductComponent component = new ProductComponent();
+    if (prodComps.isEmpty()) {
+      throw new TargetNotFound("Product doesn't have Components ! ");
+    }
+    List<ProdCompViewDTO> resp = productComponentMapper.toViewDTOList(prodComps);
+    log.info("list of product {} components {}  returned", productId, resp);
+    return resp;
+  }
 
-                   component.setComponentProduct(componentProduct);
-                   component.setParentProduct(parentProduct);
-                   component.setRatioInKg(compRatio.ratioInKg());
-                   productComponentRepo.save(component);
-                   response.add(productComponentMapper.toViewDTO(component));
-          }
-          if( totalratio.compareTo(BigDecimal.ONE) != 0){
-            throw new RatioError("the ratio of simple components is not exactly 100% it is : " + totalratio.multiply(BigDecimal.valueOf(100)) + "%" );
-          }
+  public List<ProductComponent> findProdCompsToSys(long productId) {
+    Optional<Product> optProduct = productRepo.findById(productId);
+    if (optProduct.isEmpty()) {
+      throw new TargetNotFound("Product : " + productId + "not found");
+    }
+    Product product = optProduct.get();
+    if (!product.getProductType().equals(ProductTypes.COMPOSITE)) {
+      throw new TypeError("Product Type is not COMPOSITE");
+    }
 
-          return response;
-         }
-      @Transactional
-      public void deleteProductComponents(long id) {
-       Product product = productRepo.findByIdWithComponents(id).
-               orElseThrow(() -> new TargetNotFound("the product : " +  id+ " doesn't exist"));
-       if(product.getComponents().isEmpty()) {
-           throw new IllegalStateException(" the product : "+ id +" doesn't have components ");
-       }
-       productComponentRepo.deleteByParentProductId(id);
+    List<ProductComponent> prodComps = productComponentRepo.findByParentProductId(productId);
 
+    if (prodComps.isEmpty()) {
+      throw new TargetNotFound("Product doesn't have Components ! ");
+    }
+    log.info(
+        "list of product {} components {} requested in the system and returned",
+        productId,
+        prodComps);
+    return prodComps;
+  }
+
+  @Transactional
+  public List<ProdCompViewDTO> createProductComponentList(
+      CreateProdCompsRequest createProdCompsRequest) {
+    List<ProdCompViewDTO> response = new ArrayList<>();
+    Product parentProduct =
+        productRepo
+            .findByIdWithComponents(createProdCompsRequest.parentProductId())
+            .orElseThrow(
+                () ->
+                    new TargetNotFound(
+                        "the product : "
+                            + createProdCompsRequest.parentProductId()
+                            + " doesn't exist"));
+    if (!parentProduct.getProductType().equals(ProductTypes.COMPOSITE)) {
+      throw new TypeError("the product type is not COMPOSITE");
+    }
+    if (!parentProduct.getComponents().isEmpty()) {
+      throw new AlreadyHaveComponents(
+          "the product already have components, if you want edit delete them then enter the new components!");
+    }
+
+    List<ComponentRatioDTO> compRatios = createProdCompsRequest.components();
+    BigDecimal totalratio = new BigDecimal("0");
+    for (ComponentRatioDTO compRatio : compRatios) {
+      Product componentProduct =
+          productRepo
+              .findById(compRatio.componentProductID())
+              .orElseThrow(
+                  () ->
+                      new TargetNotFound(
+                          "the product component : "
+                              + compRatio.componentProductID()
+                              + " doesn't exist"));
+      if (componentProduct.getProductType().equals(ProductTypes.COMPOSITE)) {
+        throw new TypeError("the components type mostn't be COMPOSITE");
       }
+      if (componentProduct.getProductType().equals(ProductTypes.SIMPLE)) {
+        totalratio = totalratio.add(compRatio.ratioInKg());
+      }
+      ProductComponent component = new ProductComponent();
+
+      component.setComponentProduct(componentProduct);
+      component.setParentProduct(parentProduct);
+      component.setRatioInKg(compRatio.ratioInKg());
+      productComponentRepo.save(component);
+      response.add(productComponentMapper.toViewDTO(component));
+    }
+    if (totalratio.compareTo(BigDecimal.ONE) != 0) {
+      throw new RatioError(
+          "the ratio of simple components is not exactly 100% it is : "
+              + totalratio.multiply(BigDecimal.valueOf(100))
+              + "%");
+    }
+    log.info(
+        "list of product {} components {} created ",
+        createProdCompsRequest.parentProductId(),
+        response);
+
+    return response;
+  }
+
+  @Transactional
+  public void deleteProductComponents(long id) {
+    Product product =
+        productRepo
+            .findByIdWithComponents(id)
+            .orElseThrow(() -> new TargetNotFound("the product : " + id + " doesn't exist"));
+    if (product.getComponents().isEmpty()) {
+      throw new IllegalStateException(" the product : " + id + " doesn't have components ");
+    }
+    log.info("list of product {} components deleted ", id);
+
+    productComponentRepo.deleteByParentProductId(id);
+  }
 }

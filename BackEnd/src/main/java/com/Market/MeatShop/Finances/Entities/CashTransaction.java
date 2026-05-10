@@ -25,8 +25,8 @@ public class CashTransaction {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(
             name = "cash_transactions_seq_gen",
-            sequenceName = "cash_transactions_id_seq",
-            allocationSize = 1
+            sequenceName = "cash_transactions_seq",
+            allocationSize = 50
     )
     private Long id;
 

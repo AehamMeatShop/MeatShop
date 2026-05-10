@@ -24,8 +24,8 @@ public class ProductComponent {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(
             name = "product_components_seq_gen",
-            sequenceName = "product_components_id_seq",
-            allocationSize = 1
+            sequenceName = "product_components_seq",
+            allocationSize = 50
     )
     private long id;
 

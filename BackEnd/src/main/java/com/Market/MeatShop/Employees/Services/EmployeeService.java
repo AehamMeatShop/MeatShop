@@ -29,8 +29,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.util.FullyNamed;
+
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,16 +42,19 @@ public class EmployeeService {
   private final EmployeeRepo employeeRepo;
   private final PartyService partyService;
   private final PartyContactService partyContactService;
-
+  private final BCryptPasswordEncoder encoder;
   public EmployeeService(
       EmployeeRepo employeeRepo,
       EmployeeMapper employeeMapper,
       PartyService partyService,
-      PartyContactService partyContactService) {
+      PartyContactService partyContactService,
+      BCryptPasswordEncoder encoder) {
     this.employeeRepo = employeeRepo;
     this.employeeMapper = employeeMapper;
     this.partyService = partyService;
     this.partyContactService = partyContactService;
+    this.encoder=encoder;
+
   }
 
   public EmployeeViewDTO createEmployee(CreateEmployeeReq req) {
@@ -61,7 +65,7 @@ public class EmployeeService {
     Employee emp = new Employee();
     emp.setRole(req.role());
     emp.setEmail(req.email());
-    emp.setPassword(req.password());
+    emp.setPassword(encoder.encode(req.password()));
     emp.setSalary(req.salary());
     emp.setStatus(req.status());
     emp.setPartyId(partyId);

@@ -26,8 +26,8 @@ public class Employee {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(
             name = "employees_seq_gen",
-            sequenceName = "employees_id_seq",
-            allocationSize = 1
+            sequenceName = "employees_seq",
+            allocationSize = 50
     )
     private Long id;
 

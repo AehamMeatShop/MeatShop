@@ -1,36 +1,43 @@
 spring:
+  profiles:
+    active: dev
   application:
     name: MeatShop
-  datasource :
-    url: jdbc:postgresql://localhost:7777/meat_shop
-    username: appointment_user
-    password: appointment_pass
-    driver-class-name: org.postgresql.Driver
-    hikari :
-      maximum-pool-size: 10
-      minimum-idle: 5
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:7777/meat_shop}
+    username: ${DB_USER:appointment_user}
+    password: ${DB_PASS:appointment_pass}
+    driver-class-name: ${DB_DRIVER_NAME:org.postgresql.Driver}
+    hikari:
+      maximum-pool-size: ${MAX_POOL_SIZE:10}
+      minimum-idle: ${MIN_IDLE_CONNECTIONS:5}
+      connection-timeout: ${MAX_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${IDLE_TIMEOUT:600000}
+      max-lifetime: ${MAX_LIFETIME:1800000}
 
-  jpa :
+  jpa:
+    show-sql: false
     hibernate:
-      ddl-auto : validate
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+    open-in-view: false
 
-      show-sql : true
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQLDialect
-          format_sql: true
-          use_sql_comments: true
-          database : postgres
-          database-platform : org.hibernate:dialect.PostgreSQLDialect
-        open-in-view: false
-  flyway :
-    enabled : true
+  flyway:
+    enabled: true
     baseline-on-migrate: true
     baseline-version: 0
-    username: appointment_user
-    password: appointment_pass
-    locations : classpath:db/migration
-    clean : false
+    username: ${DB_USER:appointment_user}
+    password: ${DB_PASS:appointment_pass}
+    locations: classpath:db/migration
+    clean: false
+
+logging:
+  level:
+    org.springframework.web: ${SPRING_WEB_LOG_LEVEL:INFO}
+    org.springframework.security: ${SPRING_SECURITY_LOG_LEVEL:TRACE}
+    org.hibernate: ${SPRING_HIBERNATE_LOG_LEVEL:ERROR}
+    com.Market.MeatShop: ${SPRING_MEAT_SHOP_LOG_LEVEL:INFO}

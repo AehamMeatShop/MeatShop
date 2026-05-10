@@ -20,8 +20,8 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(
             name = "categories_seq_gen",
-            sequenceName = "categories_id_seq",
-            allocationSize = 1
+            sequenceName = "categories_seq",
+            allocationSize = 50
     )
     private Long id;
 

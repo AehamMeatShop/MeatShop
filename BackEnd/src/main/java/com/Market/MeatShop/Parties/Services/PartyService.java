@@ -12,9 +12,9 @@ import com.Market.MeatShop.Parties.Repositories.PartyRepo;
 import com.Market.MeatShop.Parties.Spesifications.PartySpecifications;
 import com.Market.MeatShop.Products.QueryRoles.ProductQueryRoles;
 import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
-import jakarta.servlet.http.Part;
+
 import jakarta.transaction.Transactional;
-import org.springframework.boot.data.autoconfigure.web.DataWebProperties;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

@@ -29,8 +29,8 @@ public class Party {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(
             name = "parties_seq_gen",
-            sequenceName = "parties_id_seq",
-            allocationSize = 1
+            sequenceName = "parties_seq",
+            allocationSize = 50
     )
     private Long id;
 

@@ -25,8 +25,8 @@ public class InvoiceComponent {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(
             name = "invoice_components_seq_gen",
-            sequenceName = "invoice_components_id_seq",
-            allocationSize = 1
+            sequenceName = "invoice_components_seq",
+            allocationSize = 50
     )
     private Long id;
 

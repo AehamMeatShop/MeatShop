@@ -24,8 +24,8 @@ public class StockMovment {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(
             name = "stock_movments_seq_gen",
-            sequenceName = "stock_movments_id_seq",
-            allocationSize = 1
+            sequenceName = "stock_movments_seq",
+            allocationSize = 50
     )
     private long id;
 

@@ -41,3 +41,27 @@ logging:
     org.springframework.security: ${SPRING_SECURITY_LOG_LEVEL:TRACE}
     org.hibernate: ${SPRING_HIBERNATE_LOG_LEVEL:ERROR}
     com.Market.MeatShop: ${SPRING_MEAT_SHOP_LOG_LEVEL:INFO}
+
+data:
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:7000}
+    timeout: ${REDIS_TIME_OUT:60000}
+    lettuce:
+      pool:
+        max-active: ${MAX_REDIS_ACTIVE:8}
+        max-idle: ${MAX_REDIS_IDLE:8}
+        min-idle: ${MIN_REDIS_IDLE:2}
+        max-wait: ${MAX_REDIS_WAIT:-1ms}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: MeatShop

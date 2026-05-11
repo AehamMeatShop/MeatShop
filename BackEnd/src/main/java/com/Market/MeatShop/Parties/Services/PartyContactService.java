@@ -9,8 +9,11 @@ import com.Market.MeatShop.Parties.Mappers.PartyContactMapper;
 import com.Market.MeatShop.Parties.Repositories.PartyContactRepo;
 import com.Market.MeatShop.Parties.Repositories.PartyRepo;
 import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
+import com.Market.MeatShop.Parties.Utils.PartyContactComparison;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class PartyContactService {
     private final PartyRepo partyRepo;
@@ -33,21 +36,28 @@ public class PartyContactService {
         partyContact.setParty(party);
 
         partyContactRepo.save(partyContact);
-
-    return partyContactMapper.toViewDTO(partyContact);
+        PartyContactViewDTO resp = partyContactMapper.toViewDTO(partyContact);
+        log.info("party contact created {}", resp);
+        return resp;
     }
     public PartyContactViewDTO updatePartyContact(UpdatePartyContactReq req , Long id){
       PartyContact partyContact=findByIdEn(id);
       PartyContact originalCopy=partyContactMapper.clone(partyContact);
       partyContact = partyContactMapper.toEntity(req , partyContact);
-      if(originalCopy.equals(partyContact)){
+      
+      // Use manual comparison to check if any changes were made
+      if(PartyContactComparison.hasNoChanges(originalCopy, partyContact, req)){
           throw new IllegalArgumentException("no changes");
       }
+      
       partyContactRepo.save(partyContact);
-      return partyContactMapper.toViewDTO(partyContact);
+      PartyContactViewDTO resp = partyContactMapper.toViewDTO(partyContact);
+      log.info("party contact updated {}", resp);
+      return resp;
     }
     public void deletePartyContact(Long id){
          findByIdEn(id);
         partyContactRepo.deleteById(id);
+        log.info("party contact deleted {}", id);
     }
 }

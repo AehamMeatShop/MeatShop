@@ -32,7 +32,7 @@ public class ProductController {
   @GetMapping
   public ResponseEntity<?> getAllProducts() {
     log.info("GET /products requested");
-    return ResponseEntity.status(HttpStatus.OK).body(productService.findAll());
+    return ResponseEntity.status(HttpStatus.OK).body(productService.findAllProducts());
   }
 
   @PostMapping("")

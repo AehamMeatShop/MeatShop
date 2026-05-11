@@ -13,6 +13,7 @@ import com.Market.MeatShop.Products.QueryRoles.ProductQueryRoles;
 import com.Market.MeatShop.Products.Repositories.CategoryRepo;
 import com.Market.MeatShop.Products.Repositories.ProductRepo;
 import com.Market.MeatShop.Products.Specifications.ProductSpecfications;
+import com.Market.MeatShop.Products.Utils.ProductComparison;
 import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
 
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class ProductService {
     this.categoryRepo = categoryRepo;
   }
 
-  public List<ProductViewDTO> findAll() {
+  public List<ProductViewDTO> findAllProducts() {
     List<Product> products = productRepo.findAll();
     List<ProductViewDTO> productViewDTOList = productMapper.toProductViewDTOList(products);
     return productViewDTOList;
@@ -112,11 +113,10 @@ public class ProductService {
     Product product =
         productRepo.findById(id).orElseThrow(() -> new TargetNotFound("Product Id : " + id));
 
-    productMapper.updateFromRequest(productUpdateRequest, product);
     Product originalCopy = productMapper.clone(product);
-    if (originalCopy.equals(product)) {
-      throw new IllegalArgumentException("no changes");
-    }
+
+    productMapper.updateFromRequest(productUpdateRequest, product);
+
     if (productUpdateRequest.categoryId() != null) {
 
       Category category =
@@ -130,6 +130,10 @@ public class ProductService {
       product.setCategory(category);
     }
 
+    // Use manual comparison to check if any changes were made
+    if (ProductComparison.hasNoChanges(originalCopy, product, productUpdateRequest)) {
+      throw new IllegalArgumentException("no changes");
+    }
     product = productRepo.save(product);
     ProductViewDTO resp = productMapper.toProductViewDTO(product);
     log.info("product updated {}", resp);

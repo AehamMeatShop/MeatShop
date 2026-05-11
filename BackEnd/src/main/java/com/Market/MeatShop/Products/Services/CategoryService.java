@@ -7,6 +7,7 @@ import com.Market.MeatShop.Shared.Exceptions.AlreadyHaveSame;
 import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
 import com.Market.MeatShop.Products.Mappers.CategoryMapper;
 import com.Market.MeatShop.Products.Repositories.CategoryRepo;
+import com.Market.MeatShop.Products.Utils.CategoryComparison;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -63,7 +64,8 @@ public class CategoryService {
 
       categoryMapper.updateFromRequest(categoryCreateRequest, updateCategory);
 
-      if (originalCopy.equals(updateCategory)) {
+      // Use manual comparison to check if any changes were made
+      if (CategoryComparison.hasNoChanges(originalCopy, updateCategory, categoryCreateRequest)) {
         throw new IllegalArgumentException("no changes");
       }
 

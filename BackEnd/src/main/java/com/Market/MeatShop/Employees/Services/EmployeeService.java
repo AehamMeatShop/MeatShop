@@ -9,6 +9,7 @@ import com.Market.MeatShop.Employees.Mappers.EmployeeMapper;
 import com.Market.MeatShop.Employees.QueryRoles.EmployeeQueryRoles;
 import com.Market.MeatShop.Employees.Repositories.EmployeeRepo;
 import com.Market.MeatShop.Employees.Specifications.EmployeeSpecification;
+import com.Market.MeatShop.Employees.Utils.EmployeeComparison;
 import com.Market.MeatShop.Parties.DTOs.PartyContactViewDTO;
 import com.Market.MeatShop.Parties.DTOs.PartyViewDTO;
 import com.Market.MeatShop.Parties.DTOs.Requests.CreatePartyContactReq;
@@ -31,11 +32,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class EmployeeService {
   private final EmployeeMapper employeeMapper;
@@ -71,7 +74,9 @@ public class EmployeeService {
     emp.setPartyId(partyId);
     employeeRepo.save(emp);
 
-    return employeeMapper.toEmployeeViewDTO(emp);
+    EmployeeViewDTO resp = employeeMapper.toEmployeeViewDTO(emp);
+    log.info("employee created {}", resp);
+    return resp;
   }
 
   public PartyContactViewDTO createEmployeeContact(CreateEmpContactReq req) {
@@ -81,7 +86,9 @@ public class EmployeeService {
             .orElseThrow(() -> new TargetNotFound("employee not found"));
     CreatePartyContactReq partyContactReq =
         new CreatePartyContactReq(emp.getPartyId(), req.method(), req.identifier());
-    return partyContactService.createPartyContact(partyContactReq);
+    PartyContactViewDTO resp = partyContactService.createPartyContact(partyContactReq);
+    log.info("employee contact created {}", resp);
+    return resp;
   }
 
   @Transactional
@@ -102,13 +109,18 @@ public class EmployeeService {
     } else {
       Employee originalCopy = employeeMapper.clone(emp);
       emp = employeeMapper.updateFromReq(empUpdReq, emp);
-      if (originalCopy.equals(emp)) {
+      
+      // Use manual comparison to check if any changes were made
+      if (EmployeeComparison.hasNoChanges(originalCopy, emp, empUpdReq)) {
         throw new IllegalArgumentException("no changes");
       }
+      
       employeeRepo.save(emp);
     }
 
-    return new EmployeeFullViewDTO(employeeMapper.toEmployeeViewDTO(emp), partyResp.partyInfo());
+    EmployeeFullViewDTO resp = new EmployeeFullViewDTO(employeeMapper.toEmployeeViewDTO(emp), partyResp.partyInfo());
+    log.info("employee updated {}", resp);
+    return resp;
   }
 
   @Transactional
@@ -120,6 +132,7 @@ public class EmployeeService {
     }
     partyService.deleteParty(employee.getPartyId());
     employeeRepo.delete(employee);
+    log.info("employee deleted {}", id);
   }
 
   public EmployeeFullViewDTO getEmployeeById(Long id) {
@@ -210,6 +223,7 @@ public class EmployeeService {
                     employeesPage.getPageable(),
                     employeesPage.getTotalElements()
             );
+    log.info("employees returned {}", resultPage.getContent());
     return resultPage;
 
   }

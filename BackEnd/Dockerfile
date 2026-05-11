@@ -6,14 +6,14 @@ COPY mvnw pom.xml ./
 COPY .mvn .mvn
 RUN chmod +x mvnw
 
-# 2. حمّل الديبندنسيز - بيتكاش لأن pom.xml ما تغير
+-
 RUN --mount=type=cache,target=/root/.m2 \
     ./mvnw dependency:go-offline -B
 
-# 3. بس هون انسخ الكود
+
 COPY src ./src
 
-# 4. ابني
+
 RUN --mount=type=cache,target=/root/.m2 \
     ./mvnw clean package -DskipTests
 

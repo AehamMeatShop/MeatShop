@@ -12,6 +12,7 @@ import com.Market.MeatShop.Parties.Repositories.PartyRepo;
 import com.Market.MeatShop.Parties.Spesifications.PartySpecifications;
 import com.Market.MeatShop.Products.QueryRoles.ProductQueryRoles;
 import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
+import com.Market.MeatShop.Parties.Utils.PartyComparison;
 
 import jakarta.transaction.Transactional;
 
@@ -19,11 +20,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class PartyService {
   private final PartyRepo partyRepo;
@@ -35,17 +38,19 @@ public class PartyService {
   }
 
   public PartyViewDTO createParty(CreatePartyRequest req) {
-
-    return partyMapper.toViewDTO(partyRepo.save(partyMapper.toEntity(req)));
+    PartyViewDTO resp = partyMapper.toViewDTO(partyRepo.save(partyMapper.toEntity(req)));
+    log.info("party created {}", resp);
+    return resp;
   }
 
   public PartyViewDTO findPartyById(long id) {
-
     Optional<Party> party = partyRepo.findById(id);
     if (party.isEmpty()) {
       throw new TargetNotFound("party : " + id + " not found");
     }
-    return partyMapper.toViewDTO(party.get());
+    PartyViewDTO resp = partyMapper.toViewDTO(party.get());
+    log.info("party returned {}", resp);
+    return resp;
   }
 
   public Party findPartyByIdEn(long id) {
@@ -53,6 +58,7 @@ public class PartyService {
     if (party.isEmpty()) {
       throw new TargetNotFound("party : " + id + " not found");
     }
+    log.info("party requested and returned as entity {}", party.get().getId());
     return party.get();
   }
 
@@ -93,15 +99,16 @@ public class PartyService {
       throw new IllegalArgumentException(
           "Page size is greater than " + ProductQueryRoles.maxPageSize);
     }
-    Specification<Party> spec =createSpecification(filter);
+    Specification<Party> spec = createSpecification(filter);
     Page<Party> partyPage = partyRepo.findAll(spec, pageable);
-
-    return partyPage.map(partyMapper::toViewDTO);
+    Page<PartyViewDTO> resp = partyPage.map(partyMapper::toViewDTO);
+    log.info("parties returned {}", resp.getContent());
+    return resp;
   }
 
-  public List<PartyViewDTO> findByFilterServ(PartyFilterReq filter , List<Long> ids ) {
-    Specification<Party> spec =createSpecification(filter);
-    spec=spec.and(PartySpecifications.inIds(ids));
+  public List<PartyViewDTO> findByFilterServ(PartyFilterReq filter, List<Long> ids) {
+    Specification<Party> spec = createSpecification(filter);
+    spec = spec.and(PartySpecifications.inIds(ids));
     List<Party> parties = partyRepo.findAll(spec);
 
     return partyMapper.toViewDTO(parties);
@@ -109,21 +116,25 @@ public class PartyService {
 
   @Transactional
   public UpdatePartyResp updateParty(UpdatePartyReq req, Long id) {
-
     Party party = findPartyByIdEn(id);
     Party orginalCopy = partyMapper.clone(party);
-    party = partyMapper.fromUpdateReq(req, party);
-    if (orginalCopy.equals(party)) {
+    partyMapper.fromUpdateReq(req, party);
+    
+    // Use manual comparison to check if any changes were made
+    if (PartyComparison.hasNoChanges(orginalCopy, party, req)) {
       return new UpdatePartyResp(false, partyMapper.toViewDTO(party));
     }
+    
     partyRepo.save(party);
-
-    return new UpdatePartyResp(true, partyMapper.toViewDTO(party));
+    UpdatePartyResp resp = new UpdatePartyResp(true, partyMapper.toViewDTO(party));
+    log.info("party updated {}", resp.partyInfo());
+    return resp;
   }
 
   @Transactional
   public void deleteParty(Long id) {
     findPartyByIdEn(id);
     partyRepo.deleteById(id);
+    log.info("party deleted {}", id);
   }
 }

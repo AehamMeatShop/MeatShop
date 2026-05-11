@@ -76,8 +76,8 @@ services:
     volumes:
       - ../Monitoring/alloy/alloy.config:/etc/alloy/config.alloy
       - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/timezone:/etc/timezone:ro      # <--- مزامنة الوقت
-      - /etc/localtime:/etc/localtime:ro    # <--- مزامنة الوقت
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
     command: [ "run", "--storage.path=/var/lib/alloy/data", "/etc/alloy/config.alloy" ]
     networks:
       - meat_shop_network

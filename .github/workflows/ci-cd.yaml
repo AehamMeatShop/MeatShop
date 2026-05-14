@@ -1,5 +1,5 @@
 name: Build and deploy MeatShopApp
-runs-on: self-hosted
+
 on:
   push:
     branches:
@@ -11,6 +11,7 @@ on:
 jobs:
   build-deploy:
     name: Build and deploy MeatShopApp
+    runs-on: self-hosted
     steps:
       - name: docker compose build
         run: docker compose up

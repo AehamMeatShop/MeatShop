@@ -1,4 +1,4 @@
-name: Build and deploy MeatShopApp
+name: Build and Deploy MeatShopApp
 
 on:
   push:
@@ -10,8 +10,51 @@ on:
 
 jobs:
   build-deploy:
-    name: Build and deploy MeatShopApp
+    name: Build and Deploy MeatShopApp
     runs-on: self-hosted
+
     steps:
-      - name: docker compose build
-        run: docker compose up ~/MeatShop/Docker
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+
+      - name: Install Maven
+        run: |
+          sudo apt update
+          sudo apt install maven -y
+
+
+      - name: Verify Java and Maven
+        run: |
+          java -version
+          mvn -version
+
+
+      - name: Build Spring Boot Backend
+        run: |
+          cd CoreBackend
+          mvn clean install -DskipTests
+
+
+      - name: Build Backend Docker Image
+        run: |
+          cd BackEnd
+          docker build .
+
+
+      - name: Run Docker Compose
+        run: |
+          cd Docker
+          docker-compose down
+          docker-compose up --build -d
+
+
+      - name: Check Containers
+        run: docker ps

@@ -36,10 +36,8 @@ public class ProductService {
   private final CategoryRepo categoryRepo;
 
   public ProductService(
-      ProductRepo productRepo,
-      ProductMapper productMapper,
+      ProductRepo productRepo, ProductMapper productMapper, CategoryRepo categoryRepo) {
 
-      CategoryRepo categoryRepo) {
     this.productMapper = productMapper;
     this.productRepo = productRepo;
 

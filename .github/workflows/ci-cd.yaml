@@ -39,7 +39,7 @@ jobs:
 
       - name: Build Spring Boot Backend
         run: |
-          cd CoreBackend
+          cd BackEnd
           mvn clean install -DskipTests
 
 
@@ -47,7 +47,6 @@ jobs:
         run: |
           cd BackEnd
           docker build .
-
 
       - name: Run Docker Compose
         run: |

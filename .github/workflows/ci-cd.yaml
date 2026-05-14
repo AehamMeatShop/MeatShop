@@ -35,8 +35,7 @@ jobs:
       - name: Build Backend Docker Image
         working-directory: BackEnd
         run: |
-          DOCKER_BUILDKIT=1 docker build \
-            -t meatshop-backend:latest .
+          docker build -t meat_shop:latest .
 
       - name: Run Docker Compose
         run: |

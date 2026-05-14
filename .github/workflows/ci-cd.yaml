@@ -1,20 +1,7 @@
-name: Build and Deploy MeatShopApp
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
 jobs:
   build-deploy:
     name: Build and Deploy MeatShopApp
     runs-on: self-hosted
-
-    env:
-      DOCKER_BUILDKIT: 1  # ← أضف هاد
 
     steps:
       - name: Checkout project

@@ -1,17 +1,10 @@
-name: Build and Deploy MeatShopApp
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
 jobs:
   build-deploy:
     name: Build and Deploy MeatShopApp
     runs-on: self-hosted
+
+    env:
+      DOCKER_BUILDKIT: 1  # ← أضف هاد
 
     steps:
       - name: Checkout project
@@ -34,14 +27,13 @@ jobs:
 
       - name: Build Backend Docker Image
         working-directory: BackEnd
-        run: |
-          docker build -t meat_shop:latest .
+        run: docker build -t meat_shop:latest .
 
       - name: Run Docker Compose
         run: |
           cd Docker
-          docker-compose down || true
-          docker-compose up --build -d
+          docker compose down || true
+          docker compose up -d
 
       - name: Check Containers
         run: docker ps

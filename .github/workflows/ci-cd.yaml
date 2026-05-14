@@ -1,0 +1,16 @@
+name: Build and deploy MeatShopApp
+runs-on: [ self-hosted,ubuntu-20.04 ]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    name: Build and deploy MeatShopApp
+    steps:
+      - name: docker compose build
+        run: docker compose up

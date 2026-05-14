@@ -7,7 +7,7 @@ import com.Market.MeatShop.Products.DTOs.Requests.ProductFilterRequest;
 import com.Market.MeatShop.Products.DTOs.Requests.ProductUpdateRequest;
 import com.Market.MeatShop.Products.Entities.Category;
 import com.Market.MeatShop.Products.Entities.Product;
-import com.Market.MeatShop.Products.Mappers.CategoryMapper;
+
 import com.Market.MeatShop.Products.Mappers.ProductMapper;
 import com.Market.MeatShop.Products.QueryRoles.ProductQueryRoles;
 import com.Market.MeatShop.Products.Repositories.CategoryRepo;
@@ -32,17 +32,17 @@ public class ProductService {
 
   private final ProductRepo productRepo;
   private final ProductMapper productMapper;
-  private CategoryMapper categoryMapper;
+
   private final CategoryRepo categoryRepo;
 
   public ProductService(
       ProductRepo productRepo,
       ProductMapper productMapper,
-      CategoryMapper categoryMapper,
+
       CategoryRepo categoryRepo) {
     this.productMapper = productMapper;
     this.productRepo = productRepo;
-    this.categoryMapper = categoryMapper;
+
     this.categoryRepo = categoryRepo;
   }
 

@@ -29,13 +29,13 @@ jobs:
           java -version
           mvn -version
 
-      - name: Build Maven Project
-        working-directory: BackEnd
-        run: mvn clean install -DskipTests
-
-      - name: Build Backend Docker Image
-        working-directory: BackEnd
-        run: docker build -t aehamalhaeak/meat_shop:latest .
+      #      - name: Build Maven Project
+      #        working-directory: BackEnd
+      #        run: mvn clean install -DskipTests
+      #
+      #      - name: Build Backend Docker Image
+      #        working-directory: BackEnd
+      #        run: docker build -t aehamalhaeak/meat_shop:latest .
 
       - name: Run Docker Compose
         run: |

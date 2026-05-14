@@ -6,7 +6,7 @@ COPY mvnw pom.xml ./
 COPY .mvn .mvn
 RUN chmod +x mvnw
 
--
+
 RUN --mount=type=cache,target=/root/.m2 \
     ./mvnw dependency:go-offline -B
 

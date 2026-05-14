@@ -37,7 +37,7 @@ services:
 
   backend:
     image:
-      aehamalhaeak/meat_shop:latest
+      aehamalhaeak/meat_shop:${BACKEND_VERSION}
     container_name: meat_shop_backend
 
     environment:

@@ -17,41 +17,32 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v4
 
-
       - name: Setup JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
 
-
-      - name: Install Maven
-        run: |
-          sudo apt update
-          sudo apt install maven -y
-
-
       - name: Verify Java and Maven
         run: |
           java -version
           mvn -version
 
-
-      - name: Build Spring Boot Backend
-        run: |
-          cd BackEnd
-          mvn clean install -DskipTests
-
+      - name: Build Maven Project
+        working-directory: BackEnd
+        run: mvn clean install -DskipTests
 
       - name: Build Backend Docker Image
+        working-directory: BackEnd
         run: |
-          cd BackEnd
-          docker build .
+          DOCKER_BUILDKIT=1 docker build \
+            -t meatshop-backend:latest .
 
       - name: Run Docker Compose
         run: |
           cd Docker
-          docker-compose down
+          docker-compose down || true
           docker-compose up --build -d
+
       - name: Check Containers
         run: docker ps

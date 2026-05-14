@@ -36,7 +36,8 @@ services:
       - meat_shop_network
 
   backend:
-    image: aehamalhaeak/meat_shop:1.0
+    image:
+      aehamalhaeak/meat_shop:latest
     container_name: meat_shop_backend
 
     environment:

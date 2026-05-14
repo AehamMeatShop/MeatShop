@@ -38,7 +38,7 @@ jobs:
 
       - name: Build Backend Docker Image
         working-directory: BackEnd
-        run: docker build -t meat_shop:latest .
+        run: docker build -t aehamalhaeak/meat_shop:latest .
 
       - name: Run Docker Compose
         run: |

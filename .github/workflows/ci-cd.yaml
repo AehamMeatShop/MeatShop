@@ -26,6 +26,7 @@ jobs:
           
           echo 'DB_NAME=${{ secrets.DB_NAME }}' > Docker/.env
           chown -R $USER:$USER Docker/.env
+          chmod 600 Docker/.env
           echo 'DB_USER=${{ secrets.DB_USER }}' >> Docker/.env
           echo 'DB_PASS=${{ secrets.DB_PASS }}' >> Docker/.env
           echo 'DB_PORT=${{ secrets.DB_PORT }}' >> Docker/.env

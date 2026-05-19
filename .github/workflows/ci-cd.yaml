@@ -1,5 +1,7 @@
 name: Build and Deploy MeatShopApp
 
+
+
 on:
   push:
     branches:
@@ -14,14 +16,36 @@ jobs:
     name: Build and Deploy MeatShopApp
     runs-on: self-hosted
 
-
+    environment: dev
     steps:
       - name: Checkout project
         uses: actions/checkout@v4
 
-      - name: Load Environment Variables
-        run: cat Docker/.env >> $GITHUB_ENV
-
+      - name: make environment file
+        run: |
+          
+          echo 'DB_NAME=${{ secrets.DB_NAME }}' > Docker/.env
+          chown -R $USER:$USER Docker/.env
+          echo 'DB_USER=${{ secrets.DB_USER }}' >> Docker/.env
+          echo 'DB_PASS=${{ secrets.DB_PASS }}' >> Docker/.env
+          echo 'DB_PORT=${{ secrets.DB_PORT }}' >> Docker/.env
+          echo 'REDIS_HOST=${{ secrets.REDIS_HOST }}' >> Docker/.env
+          echo 'REDIS_PORT=${{ secrets.REDIS_PORT }}' >> Docker/.env
+          echo 'REDIS_TIME_OUT=${{ secrets.REDIS_TIME_OUT }}' >> Docker/.env
+          echo 'MAX_REDIS_ACTIVE=${{ secrets.MAX_REDIS_ACTIVE }}' >> Docker/.env
+          echo 'MAX_REDIS_IDLE=${{ secrets.MAX_REDIS_IDLE }}' >> Docker/.env
+          echo 'MIN_REDIS_IDLE=${{ secrets.MIN_REDIS_IDLE }}' >> Docker/.env
+          echo 'MAX_REDIS_WAIT=${{ secrets.MAX_REDIS_WAIT }}' >> Docker/.env
+          echo 'SPRING_WEB_LOG_LEVEL=${{ secrets.SPRING_WEB_LOG_LEVEL}}' >> Docker/.env
+          echo 'SPRING_SECURITY_LOG_LEVEL=${{ secrets.SPRING_SECURITY_LOG_LEVEL }}' >> Docker/.env
+          echo 'SPRING_HIBERNATE_LOG_LEVEL=${{ secrets.SPRING_HIBERNATE_LOG_LEVEL }}' >> Docker/.env
+          echo 'SPRING_MEAT_SHOP_LOG_LEVEL=${{ secrets.SPRING_MEAT_SHOP_LOG_LEVEL }}' >> Docker/.env
+          echo 'GF_SECURITY_ADMIN_USER=${{ secrets.GF_SECURITY_ADMIN_USER}}' >> Docker/.env
+          echo 'GF_SECURITY_ADMIN_PASSWORD=${{ secrets.GF_SECURITY_ADMIN_PASSWORD }}' >> Docker/.env
+          echo 'GF_USERS_ALLOW_SIGN_UP=${{ secrets.GF_USERS_ALLOW_SIGN_UP }}' >> Docker/.env
+          echo 'GF_SERVER_HTTP_PORT=${{ secrets.GF_SERVER_HTTP_PORT }}' >> Docker/.env
+          echo 'LOKI_SERVER_HTTP_PORT=${{ secrets.LOKI_SERVER_HTTP_PORT }}' >> Docker/.env
+          echo 'BACKEND_VERSION=${{ secrets.BACKEND_VERSION }}' >> Docker/.env
       - name: Setup JDK 21
         uses: actions/setup-java@v4
         with:

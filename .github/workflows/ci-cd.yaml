@@ -21,6 +21,10 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v4
 
+      - name: Get Version
+        id: version
+        run: echo "version=$(cat VERSION)" >> $GITHUB_OUTPUT
+
       - name: make environment file
         run: |
           
@@ -46,7 +50,7 @@ jobs:
           echo 'GF_USERS_ALLOW_SIGN_UP=${{ secrets.GF_USERS_ALLOW_SIGN_UP }}' >> Docker/.env
           echo 'GF_SERVER_HTTP_PORT=${{ secrets.GF_SERVER_HTTP_PORT }}' >> Docker/.env
           echo 'LOKI_SERVER_HTTP_PORT=${{ secrets.LOKI_SERVER_HTTP_PORT }}' >> Docker/.env
-          echo 'BACKEND_VERSION=$(cat VERSION)' >> Docker/.env
+          echo 'BACKEND_VERSION=${{ steps.version.outputs.version }}' >> Docker/.env
       - name: Setup JDK 21
         uses: actions/setup-java@v4
         with:
@@ -65,7 +69,7 @@ jobs:
       #
       #      - name: Build Backend Docker Image
       #        working-directory: BackEnd
-      #        run: docker build -t aehamalhaeak/meat_shop:latest .
+      #        run: docker build -t aehamalhaeak/meat_shop:${{ steps.version.outputs.version }} .
 
 
 

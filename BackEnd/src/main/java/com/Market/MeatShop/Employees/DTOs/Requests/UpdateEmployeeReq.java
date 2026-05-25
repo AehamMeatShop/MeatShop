@@ -1,6 +1,5 @@
 package com.Market.MeatShop.Employees.DTOs.Requests;
 
-import com.Market.MeatShop.Employees.Enums.EmployeeRole;
 import com.Market.MeatShop.Employees.Enums.EmployeeStatus;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +17,7 @@ public record UpdateEmployeeReq(
         @DecimalMin(value = "0")
         Long salary,
 
-        EmployeeRole role,
+        Long roleId,
 
         EmployeeStatus status
 ) {

@@ -92,6 +92,15 @@ public class GlobalExceptionHandler {
         .body(new ErrorResponse(message, 409, LocalDateTime.now()));
   }
 
+  @ExceptionHandler(PasswordCompromisedException.class)
+  public ResponseEntity<?> handleQuantityIsNotRegularException(PasswordCompromisedException ex) {
+
+    log.warn("ERROR : the user try to rgester with compromised password {}", ex.getMessage());
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(new ErrorResponse(ex.getMessage(), 400, LocalDateTime.now()));
+  }
+
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleAll(Exception ex) {
     log.error("UNEXPEXTED ERROR :  {}", ex);

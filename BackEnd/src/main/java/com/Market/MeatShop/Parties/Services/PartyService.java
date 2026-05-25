@@ -37,6 +37,7 @@ public class PartyService {
     this.partyMapper = partyMapper;
   }
 
+  @Transactional
   public PartyViewDTO createParty(CreatePartyRequest req) {
     PartyViewDTO resp = partyMapper.toViewDTO(partyRepo.save(partyMapper.toEntity(req)));
     log.info("party created {}", resp);
@@ -119,12 +120,12 @@ public class PartyService {
     Party party = findPartyByIdEn(id);
     Party orginalCopy = partyMapper.clone(party);
     partyMapper.fromUpdateReq(req, party);
-    
+
     // Use manual comparison to check if any changes were made
     if (PartyComparison.hasNoChanges(orginalCopy, party, req)) {
       return new UpdatePartyResp(false, partyMapper.toViewDTO(party));
     }
-    
+
     partyRepo.save(party);
     UpdatePartyResp resp = new UpdatePartyResp(true, partyMapper.toViewDTO(party));
     log.info("party updated {}", resp.partyInfo());

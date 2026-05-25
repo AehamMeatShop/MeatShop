@@ -1,6 +1,5 @@
 package com.Market.MeatShop.Employees.Entities;
 
-import com.Market.MeatShop.Employees.Enums.EmployeeRole;
 import com.Market.MeatShop.Employees.Enums.EmployeeStatus;
 import com.Market.MeatShop.Parties.Entities.Party;
 import jakarta.persistence.*;
@@ -54,9 +53,8 @@ public class Employee {
     @Column( name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private EmployeeRole role;
+    @Column(name = "role_id", nullable = false)
+    private Long roleId;
 
      @Column(name = "status" , nullable = false)
      @Enumerated(EnumType.STRING)

@@ -1,6 +1,5 @@
 package com.Market.MeatShop.Employees.DTOs;
 
-import com.Market.MeatShop.Employees.Enums.EmployeeRole;
 import com.Market.MeatShop.Employees.Enums.EmployeeStatus;
 import com.Market.MeatShop.Parties.DTOs.PartyViewDTO;
 
@@ -9,7 +8,7 @@ public record EmployeeViewDTO(
 
           long salary,
 
-          EmployeeRole role,
+          Long roleId,
 
           EmployeeStatus status
 

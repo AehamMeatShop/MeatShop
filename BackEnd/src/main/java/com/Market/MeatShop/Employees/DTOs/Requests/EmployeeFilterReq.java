@@ -1,6 +1,5 @@
 package com.Market.MeatShop.Employees.DTOs.Requests;
 
-import com.Market.MeatShop.Employees.Enums.EmployeeRole;
 import com.Market.MeatShop.Employees.Enums.EmployeeStatus;
 import jakarta.validation.constraints.DecimalMin;
 import org.hibernate.validator.constraints.Length;
@@ -18,5 +17,5 @@ public record EmployeeFilterReq(
         String email,
         @DecimalMin(value = "0") BigDecimal minSalary,
         @DecimalMin(value = "0") BigDecimal maxSalary,
-        EmployeeRole role,
+        Long roleId,
         EmployeeStatus status) {}

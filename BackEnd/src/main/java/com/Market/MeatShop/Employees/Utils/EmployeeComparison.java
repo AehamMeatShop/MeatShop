@@ -2,7 +2,6 @@ package com.Market.MeatShop.Employees.Utils;
 
 import com.Market.MeatShop.Employees.DTOs.Requests.UpdateEmployeeReq;
 import com.Market.MeatShop.Employees.Entities.Employee;
-import com.Market.MeatShop.Employees.Enums.EmployeeRole;
 import com.Market.MeatShop.Employees.Enums.EmployeeStatus;
 
 import java.util.Objects;
@@ -12,7 +11,7 @@ public class EmployeeComparison {
     /**
      * Compares employee fields that are present in the update request
      * Ignores timestamps (createdAt, updatedAt) and other auto-generated fields
-     * 
+     *
      * @param original The original employee before updates
      * @param updated The employee after applying updates
      * @param updateRequest The request containing fields to check
@@ -41,8 +40,8 @@ public class EmployeeComparison {
         }
 
         // Check role if present in request and not null
-        if (updateRequest.role() != null) {
-            if (!Objects.equals(original.getRole(), updated.getRole())) {
+        if (updateRequest.roleId() != null) {
+            if (!Objects.equals(original.getRoleId(), updated.getRoleId())) {
                 return false; // Changes detected
             }
         }
@@ -60,7 +59,7 @@ public class EmployeeComparison {
 
     /**
      * Alternative method that checks if any changes exist (opposite of hasNoChanges)
-     * 
+     *
      * @param original The original employee before updates
      * @param updated The employee after applying updates
      * @param updateRequest The request containing fields to check

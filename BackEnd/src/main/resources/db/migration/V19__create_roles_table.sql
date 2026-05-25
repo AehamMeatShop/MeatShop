@@ -1,0 +1,12 @@
+CREATE SEQUENCE IF NOT EXISTS roles_seq
+    START WITH 1
+    INCREMENT BY 50;
+CREATE TABLE roles
+(
+    id         BIGSERIAL PRIMARY KEY,
+    name       VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP
+);
+
+CREATE INDEX idx_role_name ON roles (name);

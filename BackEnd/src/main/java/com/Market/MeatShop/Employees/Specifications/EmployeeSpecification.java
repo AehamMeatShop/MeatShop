@@ -1,7 +1,6 @@
 package com.Market.MeatShop.Employees.Specifications;
 
 import com.Market.MeatShop.Employees.Entities.Employee;
-import com.Market.MeatShop.Employees.Enums.EmployeeRole;
 import com.Market.MeatShop.Employees.Enums.EmployeeStatus;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -58,9 +57,9 @@ public class EmployeeSpecification {
         criteriaBuilder.between(root.get("salary"), minSalary, maxSalary));
   }
 
-  public static Specification<Employee> asRole(EmployeeRole role){
+  public static Specification<Employee> asRole(Long roleId){
     return ((root, query, criteriaBuilder) ->
-            criteriaBuilder.equal(root.get("role"), role));
+            criteriaBuilder.equal(root.get("roleId"), roleId));
 
   }
 

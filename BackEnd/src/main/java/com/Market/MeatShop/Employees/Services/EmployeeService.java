@@ -4,7 +4,6 @@ import com.Market.MeatShop.Employees.DTOs.EmployeeFullViewDTO;
 import com.Market.MeatShop.Employees.DTOs.EmployeeViewDTO;
 import com.Market.MeatShop.Employees.DTOs.Requests.*;
 import com.Market.MeatShop.Employees.Entities.Employee;
-import com.Market.MeatShop.Employees.Enums.EmployeeRole;
 import com.Market.MeatShop.Employees.Mappers.EmployeeMapper;
 import com.Market.MeatShop.Employees.QueryRoles.EmployeeQueryRoles;
 import com.Market.MeatShop.Employees.Repositories.EmployeeRepo;
@@ -24,16 +23,23 @@ import com.Market.MeatShop.Parties.Services.PartyContactService;
 import com.Market.MeatShop.Parties.Services.PartyService;
 import com.Market.MeatShop.Parties.Spesifications.PartySpecifications;
 import com.Market.MeatShop.Products.QueryRoles.ProductQueryRoles;
+import com.Market.MeatShop.Security.Services.RoleService;
+import com.Market.MeatShop.Shared.Exceptions.PasswordCompromisedException;
 import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.authentication.password.CompromisedPasswordChecker;
+import org.springframework.security.authentication.password.CompromisedPasswordDecision;
+
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
-
+import org.springframework.web.client.ResourceAccessException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,29 +51,46 @@ public class EmployeeService {
   private final EmployeeRepo employeeRepo;
   private final PartyService partyService;
   private final PartyContactService partyContactService;
-  private final BCryptPasswordEncoder encoder;
+  private final PasswordEncoder encoder;
+  private final CompromisedPasswordChecker dPc;
+  private final RoleService roleService;
+
   public EmployeeService(
       EmployeeRepo employeeRepo,
       EmployeeMapper employeeMapper,
       PartyService partyService,
       PartyContactService partyContactService,
-      BCryptPasswordEncoder encoder) {
+      PasswordEncoder encoder,
+      CompromisedPasswordChecker dPc,
+      RoleService roleService) {
     this.employeeRepo = employeeRepo;
     this.employeeMapper = employeeMapper;
     this.partyService = partyService;
     this.partyContactService = partyContactService;
-    this.encoder=encoder;
-
+    this.encoder = encoder;
+    this.dPc = dPc;
+    this.roleService = roleService;
   }
 
+  @Transactional
   public EmployeeViewDTO createEmployee(CreateEmployeeReq req) {
     CreatePartyRequest partyReq =
         new CreatePartyRequest(req.name(), req.address(), PartyType.EMPLOYEE);
+
+    CompromisedPasswordDecision decision = dPc.check(req.password());
+    if (decision.isCompromised()) {
+      throw new PasswordCompromisedException("password is compromised");
+    }
+
     Long partyId = partyService.createParty(partyReq).id();
 
+    var roleViewDto = roleService.getRoleById(req.roleId());
+    Long roleId = roleViewDto.id();
+
     Employee emp = new Employee();
-    emp.setRole(req.role());
+    emp.setRoleId(roleId);
     emp.setEmail(req.email());
+
     emp.setPassword(encoder.encode(req.password()));
     emp.setSalary(req.salary());
     emp.setStatus(req.status());
@@ -100,25 +123,39 @@ public class EmployeeService {
         partyService.updateParty(
             new UpdatePartyReq(req.name(), req.address(), null), emp.getPartyId());
 
+    Long roleId = null;
+    if (req.roleId() != null) {
+      var roleViewDto = roleService.getRoleById(req.roleId());
+      roleId = roleViewDto.id();
+    }
+
     UpdateEmployeeReq empUpdReq =
-        new UpdateEmployeeReq(req.email(), req.password(), req.salary(), req.role(), req.status());
+        new UpdateEmployeeReq(
+            req.email(), req.password(), req.salary(), req.roleId(), req.status());
 
     if (partyResp.updated()) {
       emp = employeeMapper.updateFromReq(empUpdReq, emp);
+      if (roleId != null) {
+        emp.setRoleId(roleId);
+      }
       employeeRepo.save(emp);
     } else {
       Employee originalCopy = employeeMapper.clone(emp);
       emp = employeeMapper.updateFromReq(empUpdReq, emp);
-      
+      if (roleId != null) {
+        emp.setRoleId(roleId);
+      }
+
       // Use manual comparison to check if any changes were made
       if (EmployeeComparison.hasNoChanges(originalCopy, emp, empUpdReq)) {
         throw new IllegalArgumentException("no changes");
       }
-      
+
       employeeRepo.save(emp);
     }
 
-    EmployeeFullViewDTO resp = new EmployeeFullViewDTO(employeeMapper.toEmployeeViewDTO(emp), partyResp.partyInfo());
+    EmployeeFullViewDTO resp =
+        new EmployeeFullViewDTO(employeeMapper.toEmployeeViewDTO(emp), partyResp.partyInfo());
     log.info("employee updated {}", resp);
     return resp;
   }
@@ -127,7 +164,8 @@ public class EmployeeService {
   public void deleteEmployee(Long id) {
     Employee employee =
         employeeRepo.findById(id).orElseThrow(() -> new TargetNotFound("employee not found"));
-    if (employee.getRole().equals(EmployeeRole.SUPER_ADMIN)) {
+    var roleViewDto = roleService.getRoleById(employee.getRoleId());
+    if (roleViewDto.name().equalsIgnoreCase("SUPER_ADMIN")) {
       throw new IllegalArgumentException("cannot delete super admin");
     }
     partyService.deleteParty(employee.getPartyId());
@@ -160,8 +198,8 @@ public class EmployeeService {
     if (filter.email() != null) {
       spec = spec.and(EmployeeSpecification.asEmail(filter.email()));
     }
-    if (filter.role() != null) {
-      spec = spec.and(EmployeeSpecification.asRole(filter.role()));
+    if (filter.roleId() != null) {
+      spec = spec.and(EmployeeSpecification.asRole(filter.roleId()));
     }
     if (filter.status() != null) {
       spec = spec.and(EmployeeSpecification.asStatus(filter.status()));
@@ -186,45 +224,30 @@ public class EmployeeService {
     Page<Employee> employeesPage = employeeRepo.findAll(spec, pageable);
     List<Employee> content = employeesPage.getContent();
 
-    List<Long> partyIds=content.stream().map(Employee::getPartyId).distinct().toList();
-    PartyFilterReq partyFilterReq=new PartyFilterReq(
-            null,
-            filter.name(),
-            filter.address(),
-            PartyType.EMPLOYEE,
-            null,
-            null,null,
-            null
-    );
-    List<PartyViewDTO> parties=partyService.findByFilterServ(partyFilterReq , partyIds);
-    Map<Long, PartyViewDTO> partyMap = parties.stream()
-            .collect(Collectors.toMap(
-                    PartyViewDTO::id,
-                    p -> p
-            ));
+    List<Long> partyIds = content.stream().map(Employee::getPartyId).distinct().toList();
+    PartyFilterReq partyFilterReq =
+        new PartyFilterReq(
+            null, filter.name(), filter.address(), PartyType.EMPLOYEE, null, null, null, null);
+    List<PartyViewDTO> parties = partyService.findByFilterServ(partyFilterReq, partyIds);
+    Map<Long, PartyViewDTO> partyMap =
+        parties.stream().collect(Collectors.toMap(PartyViewDTO::id, p -> p));
 
-    List<EmployeeFullViewDTO> result = content.stream()
-            .map(emp -> {
-              PartyViewDTO party = partyMap.get(emp.getPartyId());
+    List<EmployeeFullViewDTO> result =
+        content.stream()
+            .map(
+                emp -> {
+                  PartyViewDTO party = partyMap.get(emp.getPartyId());
 
-              if (party == null) return null;
+                  if (party == null) return null;
 
-              return new EmployeeFullViewDTO(
-                      employeeMapper.toEmployeeViewDTO(emp),
-                      party
-              );
-            })
+                  return new EmployeeFullViewDTO(employeeMapper.toEmployeeViewDTO(emp), party);
+                })
             .filter(Objects::nonNull)
             .toList();
 
     Page<EmployeeFullViewDTO> resultPage =
-            new PageImpl<>(
-                    result,
-                    employeesPage.getPageable(),
-                    employeesPage.getTotalElements()
-            );
+        new PageImpl<>(result, employeesPage.getPageable(), employeesPage.getTotalElements());
     log.info("employees returned {}", resultPage.getContent());
     return resultPage;
-
   }
 }

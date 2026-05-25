@@ -8,7 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface EmployeeRepo extends JpaRepository<Employee,Long> , JpaSpecificationExecutor<Employee> {
-    Page<Employee> findAll(Specification<Employee> spec , Pageable pageable);
+public interface EmployeeRepo
+    extends JpaRepository<Employee, Long>, JpaSpecificationExecutor<Employee> {
+  Page<Employee> findAll(Specification<Employee> spec, Pageable pageable);
+
+  Optional<Employee> findByEmail(String email);
 }

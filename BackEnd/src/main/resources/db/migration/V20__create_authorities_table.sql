@@ -5,11 +5,11 @@ CREATE TABLE authorities
 (
     id         BIGSERIAL PRIMARY KEY,
     authority  VARCHAR(255) NOT NULL UNIQUE,
-    role_id    BIGINT       NOT NULL,
+
     created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP,
-    CONSTRAINT fk_authorities_role FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE
+    updated_at TIMESTAMP
+
 );
 
 CREATE INDEX idx_authority_name ON authorities (authority);
-CREATE INDEX idx_authorities_role_id ON authorities (role_id);
+

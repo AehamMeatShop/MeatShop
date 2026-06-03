@@ -1,8 +1,13 @@
 package com.Market.MeatShop.Security.Controllers;
 
+import com.Market.MeatShop.Security.DTOs.AuthorityViewDto;
+import com.Market.MeatShop.Security.DTOs.PartyRoleViewDto;
+import com.Market.MeatShop.Security.DTOs.Requests.AssignAuthorityToRoleRequest;
+import com.Market.MeatShop.Security.DTOs.Requests.AssignRoleToPartyRequest;
 import com.Market.MeatShop.Security.DTOs.Requests.CreateRoleRequest;
 import com.Market.MeatShop.Security.DTOs.Requests.UpdateRoleRequest;
 import com.Market.MeatShop.Security.DTOs.RoleViewDto;
+import com.Market.MeatShop.Security.Enums.SecuritySubjectType;
 import com.Market.MeatShop.Security.Services.RoleService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -48,6 +53,43 @@ public class RoleController {
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
     roleService.deleteRole(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  @GetMapping("/party")
+  public ResponseEntity<List<RoleViewDto>> getRolesByParty(
+      @RequestParam SecuritySubjectType partyType, @RequestParam Long partyId) {
+    List<RoleViewDto> roles = roleService.getRolesByParty(partyType, partyId);
+    return ResponseEntity.ok(roles);
+  }
+
+  @GetMapping("/{roleId}/authorities")
+  public ResponseEntity<List<AuthorityViewDto>> getAuthoritiesByRole(@PathVariable Long roleId) {
+    List<AuthorityViewDto> authorities = roleService.getAuthoritiesByRole(roleId);
+    return ResponseEntity.ok(authorities);
+  }
+
+  @PostMapping("/assign-to-party")
+  public ResponseEntity<PartyRoleViewDto> assignRoleToParty(
+      @Valid @RequestBody AssignRoleToPartyRequest request) {
+    PartyRoleViewDto partyRole = roleService.assignRoleToParty(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(partyRole);
+  }
+
+  @PostMapping("/{roleId}/authorities/{authorityId}")
+  public ResponseEntity<Void> assignAuthorityToRole(
+      @PathVariable Long roleId, @PathVariable Long authorityId) {
+    roleService.assignAuthorityToRole(
+        new AssignAuthorityToRoleRequest(roleId, authorityId));
+    return ResponseEntity.status(HttpStatus.CREATED).build();
+  }
+
+  @DeleteMapping("/remove-from-party")
+  public ResponseEntity<Void> removeRoleFromParty(
+      @RequestParam SecuritySubjectType partyType,
+      @RequestParam Long partyId,
+      @RequestParam Long roleId) {
+    roleService.removeRoleFromParty(partyType, partyId, roleId);
     return ResponseEntity.noContent().build();
   }
 }

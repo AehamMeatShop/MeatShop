@@ -1,5 +1,6 @@
 package com.Market.MeatShop.Security.Entities;
 
+import com.Market.MeatShop.Security.Enums.SecuritySubjectType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,7 +29,8 @@ public class PartyAuthority {
   private Authority authority;
 
   @Column(name = "party_type", nullable = false, length = 100)
-  private String partyType;
+  @Enumerated(EnumType.STRING)
+  private SecuritySubjectType partyType;
 
   @Column(name = "party_id", nullable = false)
   private Long partyId;

@@ -45,6 +45,14 @@ public class GlobalExceptionHandler {
         .body(new ErrorResponse(ex.getMessage(), 400, LocalDateTime.now()));
   }
 
+  @ExceptionHandler(SubjectProviderNotFoundException.class)
+  public ResponseEntity<?> handleSubjectProviderNotFoundException(
+      SubjectProviderNotFoundException ex) {
+    log.warn("ERROR :{}", ex.getMessage());
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(new ErrorResponse(ex.getMessage(), 403, LocalDateTime.now()));
+  }
+
   @ExceptionHandler(AlreadyHaveComponents.class)
   public ResponseEntity<?> handleAlreadyHaveComponentsException(AlreadyHaveComponents ex) {
     log.warn("ERROR :{}", ex.getMessage());

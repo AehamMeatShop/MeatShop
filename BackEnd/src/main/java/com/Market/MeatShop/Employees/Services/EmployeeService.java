@@ -84,11 +84,8 @@ public class EmployeeService {
 
     Long partyId = partyService.createParty(partyReq).id();
 
-    var roleViewDto = roleService.getRoleById(req.roleId());
-    Long roleId = roleViewDto.id();
-
     Employee emp = new Employee();
-    emp.setRoleId(roleId);
+
     emp.setEmail(req.email());
 
     emp.setPassword(encoder.encode(req.password()));
@@ -124,27 +121,17 @@ public class EmployeeService {
             new UpdatePartyReq(req.name(), req.address(), null), emp.getPartyId());
 
     Long roleId = null;
-    if (req.roleId() != null) {
-      var roleViewDto = roleService.getRoleById(req.roleId());
-      roleId = roleViewDto.id();
-    }
 
     UpdateEmployeeReq empUpdReq =
-        new UpdateEmployeeReq(
-            req.email(), req.password(), req.salary(), req.roleId(), req.status());
+        new UpdateEmployeeReq(req.email(), req.password(), req.salary(), req.status());
 
     if (partyResp.updated()) {
       emp = employeeMapper.updateFromReq(empUpdReq, emp);
-      if (roleId != null) {
-        emp.setRoleId(roleId);
-      }
+
       employeeRepo.save(emp);
     } else {
       Employee originalCopy = employeeMapper.clone(emp);
       emp = employeeMapper.updateFromReq(empUpdReq, emp);
-      if (roleId != null) {
-        emp.setRoleId(roleId);
-      }
 
       // Use manual comparison to check if any changes were made
       if (EmployeeComparison.hasNoChanges(originalCopy, emp, empUpdReq)) {
@@ -164,10 +151,7 @@ public class EmployeeService {
   public void deleteEmployee(Long id) {
     Employee employee =
         employeeRepo.findById(id).orElseThrow(() -> new TargetNotFound("employee not found"));
-    var roleViewDto = roleService.getRoleById(employee.getRoleId());
-    if (roleViewDto.name().equalsIgnoreCase("SUPER_ADMIN")) {
-      throw new IllegalArgumentException("cannot delete super admin");
-    }
+
     partyService.deleteParty(employee.getPartyId());
     employeeRepo.delete(employee);
     log.info("employee deleted {}", id);
@@ -198,9 +182,7 @@ public class EmployeeService {
     if (filter.email() != null) {
       spec = spec.and(EmployeeSpecification.asEmail(filter.email()));
     }
-    if (filter.roleId() != null) {
-      spec = spec.and(EmployeeSpecification.asRole(filter.roleId()));
-    }
+
     if (filter.status() != null) {
       spec = spec.and(EmployeeSpecification.asStatus(filter.status()));
     }

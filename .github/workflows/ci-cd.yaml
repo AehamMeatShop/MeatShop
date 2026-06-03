@@ -6,7 +6,9 @@ on:
   push:
     branches:
       - main
-
+  merge:
+    branches:
+      - main
 
 
 jobs:
@@ -61,13 +63,13 @@ jobs:
           mvn -version
 
 
-            - name: Build Maven Project
-              working-directory: BackEnd
-              run: mvn clean install -DskipTests
+      - name: Build Maven Project
+        working-directory: BackEnd
+        run: mvn clean install -DskipTests
 
-            - name: Build Backend Docker Image
-              working-directory: BackEnd
-              run: docker build -t aehamalhaeak/meat_shop:${{ steps.version.outputs.version }} .
+      - name: Build Backend Docker Image
+        working-directory: BackEnd
+        run: docker build -t aehamalhaeak/meat_shop:${{ steps.version.outputs.version }} .
 
 
 

@@ -1,6 +1,7 @@
 FROM eclipse-temurin:21-jdk-alpine AS builder
 WORKDIR /app
-
+RUN apk add --no-cache ca-certificates wget curl
+RUN update-ca-certificates
 COPY mvnw pom.xml ./
 COPY .mvn .mvn
 RUN chmod +x mvnw

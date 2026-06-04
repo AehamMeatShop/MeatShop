@@ -31,7 +31,8 @@ public class EmployeeSubjectProvider implements SecuritySubjectProvider {
     Employee emp =
         employeeRepo.findById(id).orElseThrow(() -> new TargetNotFound("employee not found"));
 
-    SecurityIdentity empIdentity = new SecurityIdentity(emp.getId(), supports(), emp.getEmail());
+    SecurityIdentity empIdentity =
+        new SecurityIdentity(emp.getId(), supports(), emp.getEmail(), emp.getPassword());
     return empIdentity;
   }
 }

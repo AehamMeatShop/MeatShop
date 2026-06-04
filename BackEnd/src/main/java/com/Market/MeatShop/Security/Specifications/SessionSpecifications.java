@@ -1,6 +1,7 @@
 package com.Market.MeatShop.Security.Specifications;
 
 import com.Market.MeatShop.Security.Entities.Session;
+import com.Market.MeatShop.Security.Enums.SecuritySubjectType;
 import com.Market.MeatShop.Security.Enums.SessionState;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -8,19 +9,17 @@ import java.time.LocalDateTime;
 
 public class SessionSpecifications {
 
-  public static Specification<Session> likePartyType(String partyType) {
+  public static Specification<Session> likePartyType(SecuritySubjectType partyType) {
     return (root, query, builder) ->
         builder.like(root.get("partyType").as(String.class), "%" + partyType + "%");
   }
 
   public static Specification<Session> hasPartyId(Long partyId) {
-    return (root, query, builder) ->
-        builder.equal(root.get("partyId").as(Long.class), partyId);
+    return (root, query, builder) -> builder.equal(root.get("partyId").as(Long.class), partyId);
   }
 
   public static Specification<Session> hasState(SessionState state) {
-    return (root, query, builder) ->
-        builder.equal(root.get("state").as(SessionState.class), state);
+    return (root, query, builder) -> builder.equal(root.get("state").as(SessionState.class), state);
   }
 
   public static Specification<Session> hasCreatedAt(LocalDateTime createdAt) {

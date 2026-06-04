@@ -16,13 +16,15 @@ import com.Market.MeatShop.Parties.DTOs.Requests.CreatePartyRequest;
 import com.Market.MeatShop.Parties.DTOs.Requests.PartyFilterReq;
 import com.Market.MeatShop.Parties.DTOs.Requests.UpdatePartyReq;
 import com.Market.MeatShop.Parties.DTOs.Responses.UpdatePartyResp;
-import com.Market.MeatShop.Parties.Entities.Party;
 import com.Market.MeatShop.Parties.Enums.PartyType;
 import com.Market.MeatShop.Parties.QueryRoles.PartyQueryRoles;
 import com.Market.MeatShop.Parties.Services.PartyContactService;
 import com.Market.MeatShop.Parties.Services.PartyService;
-import com.Market.MeatShop.Parties.Spesifications.PartySpecifications;
-import com.Market.MeatShop.Products.QueryRoles.ProductQueryRoles;
+
+import com.Market.MeatShop.Security.Enums.SecuritySubjectType;
+
+import com.Market.MeatShop.Security.Services.AuthorityService;
+import com.Market.MeatShop.Security.Services.LoginIndexService;
 import com.Market.MeatShop.Security.Services.RoleService;
 import com.Market.MeatShop.Shared.Exceptions.PasswordCompromisedException;
 import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
@@ -34,12 +36,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.authentication.password.CompromisedPasswordDecision;
 
-import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.client.ResourceAccessException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,6 +53,8 @@ public class EmployeeService {
   private final PasswordEncoder encoder;
   private final CompromisedPasswordChecker dPc;
   private final RoleService roleService;
+  private final LoginIndexService loginIndexService;
+  private final AuthorityService authorityService;
 
   public EmployeeService(
       EmployeeRepo employeeRepo,
@@ -62,7 +63,9 @@ public class EmployeeService {
       PartyContactService partyContactService,
       PasswordEncoder encoder,
       CompromisedPasswordChecker dPc,
-      RoleService roleService) {
+      RoleService roleService,
+      LoginIndexService loginIndexService,
+      AuthorityService authorityService) {
     this.employeeRepo = employeeRepo;
     this.employeeMapper = employeeMapper;
     this.partyService = partyService;
@@ -70,10 +73,14 @@ public class EmployeeService {
     this.encoder = encoder;
     this.dPc = dPc;
     this.roleService = roleService;
+    this.loginIndexService = loginIndexService;
+    this.authorityService = authorityService;
   }
 
   @Transactional
   public EmployeeViewDTO createEmployee(CreateEmployeeReq req) {
+    log.info("Attempting to create employee with email: {}", req.email());
+
     CreatePartyRequest partyReq =
         new CreatePartyRequest(req.name(), req.address(), PartyType.EMPLOYEE);
 
@@ -83,19 +90,30 @@ public class EmployeeService {
     }
 
     Long partyId = partyService.createParty(partyReq).id();
+    log.info("Party created with id: {}", partyId);
 
     Employee emp = new Employee();
-
     emp.setEmail(req.email());
-
     emp.setPassword(encoder.encode(req.password()));
     emp.setSalary(req.salary());
     emp.setStatus(req.status());
     emp.setPartyId(partyId);
     employeeRepo.save(emp);
+    log.info("Employee saved with id: {}", emp.getId());
+
+    boolean indexCreated =
+        loginIndexService.createIndex(emp.getId(), SecuritySubjectType.EMPLOYEE, req.email());
+    log.info("Login index creation result: {} for email: {}", indexCreated, req.email());
+
+    if (!indexCreated) {
+      log.error(
+          "Failed to create login index for email: {}, rolling back employee creation",
+          req.email());
+      throw new RuntimeException("Failed to create login index");
+    }
 
     EmployeeViewDTO resp = employeeMapper.toEmployeeViewDTO(emp);
-    log.info("employee created {}", resp);
+    log.info("employee created successfully {}", resp);
     return resp;
   }
 
@@ -113,8 +131,13 @@ public class EmployeeService {
 
   @Transactional
   public EmployeeFullViewDTO updateEmployee(UpdateEmployeeProfileReq req, Long id) {
+    log.info("Attempting to update employee with id: {}", id);
+
     Employee emp =
         employeeRepo.findById(id).orElseThrow(() -> new TargetNotFound("employee not found"));
+
+    String oldEmail = emp.getEmail();
+    String newEmail = req.email();
 
     UpdatePartyResp partyResp =
         partyService.updateParty(
@@ -127,13 +150,11 @@ public class EmployeeService {
 
     if (partyResp.updated()) {
       emp = employeeMapper.updateFromReq(empUpdReq, emp);
-
       employeeRepo.save(emp);
     } else {
       Employee originalCopy = employeeMapper.clone(emp);
       emp = employeeMapper.updateFromReq(empUpdReq, emp);
 
-      // Use manual comparison to check if any changes were made
       if (EmployeeComparison.hasNoChanges(originalCopy, emp, empUpdReq)) {
         throw new IllegalArgumentException("no changes");
       }
@@ -141,20 +162,68 @@ public class EmployeeService {
       employeeRepo.save(emp);
     }
 
+    log.info("Employee updated with id: {}", emp.getId());
+
+    if (newEmail != null && !newEmail.equals(oldEmail)) {
+      log.info("Email changed from {} to {}, updating login index", oldEmail, newEmail);
+      boolean indexUpdated = loginIndexService.updateEmail(oldEmail, newEmail);
+      log.info(
+          "Login index update result: {} for email change from {} to {}",
+          indexUpdated,
+          oldEmail,
+          newEmail);
+
+      if (!indexUpdated) {
+        log.error(
+            "Failed to update login index for email change from {} to {}, rolling back employee update",
+            oldEmail,
+            newEmail);
+        throw new RuntimeException("Failed to update login index");
+      }
+    }
+
     EmployeeFullViewDTO resp =
         new EmployeeFullViewDTO(employeeMapper.toEmployeeViewDTO(emp), partyResp.partyInfo());
-    log.info("employee updated {}", resp);
+    log.info("employee updated successfully {}", resp);
     return resp;
   }
 
   @Transactional
   public void deleteEmployee(Long id) {
+    log.info("Attempting to delete employee with id: {}", id);
+
     Employee employee =
         employeeRepo.findById(id).orElseThrow(() -> new TargetNotFound("employee not found"));
 
+    log.info("Checking if employee has SUPER_ADMIN role");
+    boolean isSuperAdmin =
+        roleService.partyHasSuperAdminRole(SecuritySubjectType.EMPLOYEE, employee.getId());
+
+    if (isSuperAdmin) {
+      log.error("Cannot delete employee with SUPER_ADMIN role");
+      throw new IllegalArgumentException("Cannot delete employee with SUPER_ADMIN role");
+    }
+
+    String email = employee.getEmail();
+    log.info("Deleting login index for email: {}", email);
+    boolean indexDeleted = loginIndexService.deleteIndex(email);
+    log.info("Login index deletion result: {} for email: {}", indexDeleted, email);
+
+    if (!indexDeleted) {
+      log.error(
+          "Failed to delete login index for email: {}, rolling back employee deletion", email);
+      throw new TargetNotFound("Failed to delete login index");
+    }
+
+    log.info("Deleting party roles for employee id: {}", employee.getId());
+    roleService.removeAllRolesForParty(SecuritySubjectType.EMPLOYEE, employee.getId());
+
+    log.info("Deleting party authorities for employee id: {}", employee.getId());
+    authorityService.removeAllAuthoritiesForParty(SecuritySubjectType.EMPLOYEE, employee.getId());
+
     partyService.deleteParty(employee.getPartyId());
     employeeRepo.delete(employee);
-    log.info("employee deleted {}", id);
+    log.info("employee deleted successfully {}", id);
   }
 
   public EmployeeFullViewDTO getEmployeeById(Long id) {
@@ -176,7 +245,7 @@ public class EmployeeService {
             });
     if (pageable.getPageSize() > PartyQueryRoles.maxPageSize) {
       throw new IllegalArgumentException(
-          "Page size is greater than " + ProductQueryRoles.maxPageSize);
+          "Page size is greater than " + EmployeeQueryRoles.maxPageSize);
     }
     Specification<Employee> spec = Specification.allOf();
     if (filter.email() != null) {

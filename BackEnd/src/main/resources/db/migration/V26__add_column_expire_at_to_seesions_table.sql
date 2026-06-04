@@ -1,0 +1,2 @@
+ALTER TABLE sessions
+    ADD COLUMN expire_at TIMESTAMP NOT NULL;

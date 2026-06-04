@@ -1,5 +1,6 @@
 package com.Market.MeatShop.Security.Entities;
 
+import com.Market.MeatShop.Security.Enums.SecuritySubjectType;
 import com.Market.MeatShop.Security.Enums.SessionState;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
-@Table(name = "Sessions")
+@Table(name = "sessions")
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,7 +30,8 @@ public class Session {
   private String refreshToken;
 
   @Column(nullable = false, name = "party_type")
-  private String partyType;
+  @Enumerated(EnumType.STRING)
+  private SecuritySubjectType partyType;
 
   @Column(nullable = false, name = "party_id")
   private Long partyId;
@@ -37,6 +39,9 @@ public class Session {
   @Column(nullable = false, name = "created_at", updatable = false)
   @CreationTimestamp
   private LocalDateTime createdAt;
+
+  @Column(name = "expire_at", nullable = false)
+  private LocalDateTime expireAt;
 
   @Column(nullable = false)
   @UpdateTimestamp

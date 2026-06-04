@@ -24,6 +24,24 @@ public class GlobalExceptionHandler {
         .body(new ErrorResponse(ex.getMessage(), 400, LocalDateTime.now()));
   }
 
+  @ExceptionHandler(LoginFaildException.class)
+  public ResponseEntity<?> handleLoginFaildException(LoginFaildException ex) {
+
+    log.warn("ERROR : Login Faild  {}", ex.getMessage());
+
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(new ErrorResponse(ex.getMessage(), 403, LocalDateTime.now()));
+  }
+
+  @ExceptionHandler(AccountNotFounException.class)
+  public ResponseEntity<?> handleAccountNotFounException(AccountNotFounException ex) {
+
+    log.warn("ERROR : Account not found  {}", ex.getMessage());
+
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(new ErrorResponse(ex.getMessage(), 403, LocalDateTime.now()));
+  }
+
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException ex) {
     log.warn("ERROR : Illegal argument: {}", ex.getMessage());

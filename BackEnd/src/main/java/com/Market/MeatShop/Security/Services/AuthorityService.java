@@ -133,4 +133,11 @@ public class AuthorityService {
     roleAuthorityRepo.delete(roleAuthority);
     log.info("Removed authority {} from role {}", authorityId, roleId);
   }
+
+  public void removeAllAuthoritiesForParty(SecuritySubjectType partyType, Long partyId) {
+    List<PartyAuthority> partyAuthorities = 
+        partyAuthorityRepo.findByPartyTypeAndPartyId(partyType, partyId);
+    partyAuthorityRepo.deleteAll(partyAuthorities);
+    log.info("Removed all authorities for party {} of type {}", partyId, partyType);
+  }
 }

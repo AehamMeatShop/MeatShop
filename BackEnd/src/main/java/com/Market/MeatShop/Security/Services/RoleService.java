@@ -75,6 +75,11 @@ public class RoleService {
         roleRepo
             .findById(id)
             .orElseThrow(() -> new TargetNotFound("Role not found with id: " + id));
+    
+    if ("SUPER_ADMIN".equals(role.getName())) {
+      throw new IllegalArgumentException("SUPER_ADMIN role cannot be updated");
+    }
+    
     roleMapper.updateEntityFromDto(request, role);
     roleRepo.save(role);
     RoleViewDto viewDto = roleMapper.toViewDto(role);
@@ -87,6 +92,11 @@ public class RoleService {
         roleRepo
             .findById(id)
             .orElseThrow(() -> new TargetNotFound("Role not found with id: " + id));
+    
+    if ("SUPER_ADMIN".equals(role.getName())) {
+      throw new IllegalArgumentException("SUPER_ADMIN role cannot be deleted");
+    }
+    
     roleRepo.delete(role);
     log.info("role deleted with id {}", id);
   }
@@ -126,6 +136,18 @@ public class RoleService {
         roleRepo
             .findById(request.roleId())
             .orElseThrow(() -> new TargetNotFound("Role not found with id: " + request.roleId()));
+    
+    if ("SUPER_ADMIN".equals(role.getName())) {
+      if (!SecuritySubjectType.EMPLOYEE.equals(request.partyType())) {
+        throw new IllegalArgumentException("SUPER_ADMIN role can only be assigned to EMPLOYEE type");
+      }
+      
+      List<PartyRole> existingSuperAdmins = partyRoleRepo.findByRoleName("SUPER_ADMIN");
+      if (!existingSuperAdmins.isEmpty()) {
+        throw new IllegalArgumentException("Only one SUPER_ADMIN can exist in the system");
+      }
+    }
+    
     PartyRole partyRole = new PartyRole();
     partyRole.setPartyType(request.partyType());
     partyRole.setPartyId(request.partyId());
@@ -167,7 +189,23 @@ public class RoleService {
                             + ", role id: "
                             + roleId));
 
+    if ("SUPER_ADMIN".equals(partyRole.getRole().getName())) {
+      throw new IllegalArgumentException("SUPER_ADMIN role cannot be removed from party");
+    }
+
     partyRoleRepo.delete(partyRole);
     log.info("Removed role {} from party {} of type {}", roleId, partyId, partyType);
+  }
+
+  public boolean partyHasSuperAdminRole(SecuritySubjectType partyType, Long partyId) {
+    List<PartyRole> partyRoles = partyRoleRepo.findByPartyTypeAndPartyId(partyType, partyId);
+    return partyRoles.stream()
+        .anyMatch(pr -> "SUPER_ADMIN".equals(pr.getRole().getName()));
+  }
+
+  public void removeAllRolesForParty(SecuritySubjectType partyType, Long partyId) {
+    List<PartyRole> partyRoles = partyRoleRepo.findByPartyTypeAndPartyId(partyType, partyId);
+    partyRoleRepo.deleteAll(partyRoles);
+    log.info("Removed all roles for party {} of type {}", partyId, partyType);
   }
 }

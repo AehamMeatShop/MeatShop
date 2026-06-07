@@ -1,14 +1,14 @@
 package com.Market.MeatShop.Security.Repositories;
 
 import com.Market.MeatShop.Security.Entities.Session;
+import com.Market.MeatShop.Security.Enums.SecuritySubjectType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.List;
+import java.util.Optional;
 
 public interface SessionRepo
     extends JpaRepository<Session, Long>, JpaSpecificationExecutor<Session> {
@@ -18,4 +18,7 @@ public interface SessionRepo
   List<Session> findByPartyType(String partyType);
 
   List<Session> findByPartyId(Long partyId);
+
+  Optional<Session> findFirstByBaseLineFingerPrintContainingAndPartyIdAndPartyType(
+      String value, Long partyId, SecuritySubjectType partyType);
 }

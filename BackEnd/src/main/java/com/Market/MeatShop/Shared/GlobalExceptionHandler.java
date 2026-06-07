@@ -33,6 +33,29 @@ public class GlobalExceptionHandler {
         .body(new ErrorResponse(ex.getMessage(), 403, LocalDateTime.now()));
   }
 
+  @ExceptionHandler(SessionStolenException.class)
+  public ResponseEntity<?> handleSessionStolenException(SessionStolenException ex) {
+
+    log.warn(
+        "ERROR : Login Faild this session is blocked and the user is traced  {}", ex.getMessage());
+
+    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+        .body(
+            new ErrorResponse(
+                "The service is temporarily unavailable. Please try again later.",
+                503,
+                LocalDateTime.now()));
+  }
+
+  @ExceptionHandler(SessionNotFoundException.class)
+  public ResponseEntity<?> handleSessionNotFoundException(SessionNotFoundException ex) {
+
+    log.warn("ERROR : Login Faild  {}", ex.getMessage());
+
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(new ErrorResponse(ex.getMessage(), 403, LocalDateTime.now()));
+  }
+
   @ExceptionHandler(AccountNotFounException.class)
   public ResponseEntity<?> handleAccountNotFounException(AccountNotFounException ex) {
 

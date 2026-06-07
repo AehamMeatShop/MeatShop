@@ -65,3 +65,8 @@ management:
   metrics:
     tags:
       application: MeatShop
+security:
+  jwt:
+    secret: ${JWT_SECRET:er3ZIZpjuQ6NMg7ef/Ieed9szbvKwWkeq+cEwG13fYA=}
+    access-token-expiry: 900
+    refresh-token-expiry: 604800

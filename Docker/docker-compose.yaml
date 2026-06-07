@@ -52,6 +52,7 @@ services:
       SPRING_MEAT_SHOP_LOG_LEVEL: ${SPRING_MEAT_SHOP_LOG_LEVEL}
       REDIS_HOST: redis
       REDIS_PORT: ${REDIS_PORT}
+      JWT_SECRET: ${JWT_SECRET}
 
     ports:
       - "8080:8080"

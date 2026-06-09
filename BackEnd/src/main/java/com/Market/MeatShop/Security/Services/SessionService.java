@@ -94,7 +94,7 @@ public class SessionService {
         || session.getState().equals(SessionState.STOLEN)
         || session.getState().equals(SessionState.REVOKED)) {
       log.info(
-          "the session : {} is : {} and try to logOut via E : {} and P",
+          "the session : {} is : {} and try to access via E : {} and P",
           session.getId(),
           session.getState(),
           identity.email());

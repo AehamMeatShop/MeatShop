@@ -1,5 +1,7 @@
 package com.Market.MeatShop.Security.Services;
 
+import com.Market.MeatShop.Security.Assemblers.SecurityIdentity;
+import com.Market.MeatShop.Security.DTOs.FingerPrint;
 import com.Market.MeatShop.Security.DTOs.Requests.SessionFilterRequest;
 import com.Market.MeatShop.Security.DTOs.SessionViewDto;
 import com.Market.MeatShop.Security.Entities.Session;
@@ -7,7 +9,11 @@ import com.Market.MeatShop.Security.Enums.SessionState;
 import com.Market.MeatShop.Security.Mappers.SessionMapper;
 import com.Market.MeatShop.Security.QueryRoles.SessionQueryRoles;
 import com.Market.MeatShop.Security.Repositories.SessionRepo;
+import com.Market.MeatShop.Security.SecurityWeb.Dto.AuthContext;
 import com.Market.MeatShop.Security.Specifications.SessionSpecifications;
+import com.Market.MeatShop.Shared.Exceptions.LoginFaildException;
+import com.Market.MeatShop.Shared.Exceptions.SessionExpiredException;
+import com.Market.MeatShop.Shared.Exceptions.SessionStolenException;
 import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,10 +27,13 @@ public class SessionService {
 
   private final SessionRepo sessionRepo;
   private final SessionMapper sessionMapper;
+  private final FingerPrintService fingerPrintService;
 
-  public SessionService(SessionRepo sessionRepo, SessionMapper sessionMapper) {
+  public SessionService(
+      SessionRepo sessionRepo, SessionMapper sessionMapper, FingerPrintService fingerPrintService) {
     this.sessionRepo = sessionRepo;
     this.sessionMapper = sessionMapper;
+    this.fingerPrintService = fingerPrintService;
   }
 
   public Page<SessionViewDto> findAllByFilter(SessionFilterRequest filter, Pageable pageable) {
@@ -76,5 +85,32 @@ public class SessionService {
     session = sessionRepo.save(session);
     log.info("Session state updated to {} for session id: {}", newState, sessionId);
     return sessionMapper.toViewDto(session);
+  }
+
+  public void traceSession(
+      Session session, SecurityIdentity identity, AuthContext authContext, String ip) {
+    if (session.getState().equals(SessionState.OBSERVED)
+        || session.getState().equals(SessionState.CHALLENGED)
+        || session.getState().equals(SessionState.STOLEN)
+        || session.getState().equals(SessionState.REVOKED)) {
+      log.info(
+          "the session : {} is : {} and try to logOut via E : {} and P",
+          session.getId(),
+          session.getState(),
+          identity.email());
+    }
+    if (session.getState().equals(SessionState.STOLEN)) {
+
+      throw new SessionStolenException("try to access to stolen session   ", identity);
+    }
+    if (session.getState().equals(SessionState.REVOKED)) {
+
+      throw new LoginFaildException(
+          "the session { "
+              + session.getId()
+              + " } with email { "
+              + identity.email()
+              + "} is revoked ");
+    }
   }
 }

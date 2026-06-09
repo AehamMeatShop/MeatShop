@@ -38,7 +38,7 @@ spring:
 logging:
   level:
     org.springframework.web: ${SPRING_WEB_LOG_LEVEL:INFO}
-    org.springframework.security: ${SPRING_SECURITY_LOG_LEVEL:TRACE}
+    org.springframework.security: ${SPRING_SECURITY_LOG_LEVEL:INFO}
     org.hibernate: ${SPRING_HIBERNATE_LOG_LEVEL:ERROR}
     com.Market.MeatShop: ${SPRING_MEAT_SHOP_LOG_LEVEL:INFO}
 

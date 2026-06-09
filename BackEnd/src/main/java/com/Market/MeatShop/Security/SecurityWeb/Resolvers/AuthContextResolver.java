@@ -8,6 +8,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import java.util.Objects;
+
 @Component
 public class AuthContextResolver implements HandlerMethodArgumentResolver {
 
@@ -32,7 +34,8 @@ public class AuthContextResolver implements HandlerMethodArgumentResolver {
     String browser = webRequest.getHeader("browser");
 
     String screenResolution = webRequest.getHeader("screenResolution");
-
-    return new AuthContext(deviceId, os, osVersion, browser, screenResolution);
+    String sidHeader = webRequest.getHeader("sid");
+    Long sid = (sidHeader != null && !sidHeader.isBlank()) ? Long.valueOf(sidHeader) : null;
+    return new AuthContext(sid, deviceId, os, osVersion, browser, screenResolution);
   }
 }

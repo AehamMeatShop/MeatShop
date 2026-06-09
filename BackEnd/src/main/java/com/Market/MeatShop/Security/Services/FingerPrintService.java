@@ -2,9 +2,11 @@ package com.Market.MeatShop.Security.Services;
 
 import com.Market.MeatShop.Security.DTOs.FingerPrint;
 import com.Market.MeatShop.Security.Enums.SessionState;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class FingerPrintService {
 
@@ -32,35 +34,43 @@ public class FingerPrintService {
   }
 
   public int getTrustScore(FingerPrint original, FingerPrint actual) {
-
+    log.info("=== TRUST SCORE CALCULATION ===");
+    log.info("Baseline: {}", serialize(original));
+    log.info("Current:  {}", serialize(actual));
     int score = 0;
 
     // 1. DID (strong signal)
     if (isPresent(original.DID())
         && isPresent(actual.DID())
         && actual.DID().equals(original.DID())) {
+      log.info("same did {} score {}", original.DID(), score);
       score += 50;
     } else {
+      log.info("def did {} score {}", original.DID(), score);
       score -= 30;
     }
 
     // 2. IP (weak signal)
     score += compareWeak(original.ip(), actual.ip(), 10, -10);
-
+    log.info("ip compare {} score {}", original.ip(), score);
     // 3. Browser
     score += compareMedium(original.browser(), actual.browser(), 10, -5);
-
+    log.info("browser compare {} score {}", original.browser(), score);
     // 4. OS
     score += compareMedium(original.os(), actual.os(), 10, -5);
+    log.info("os compare {} score {}", original.os(), score);
 
     // 5. OS Version
     score += compareWeak(original.osVersion(), actual.osVersion(), 5, 0);
+    log.info("osV compare {} score {}", original.osVersion(), score);
 
     // 6. Screen Resolution
     score += compareWeak(original.screenResolution(), actual.screenResolution(), 5, 0);
+    log.info("SR compare {} score {}", original.screenResolution(), score);
 
     // penalty for missing signals (important improvement)
     score -= missingSignalPenalty(actual);
+    log.info("penalty {} score {} ", missingSignalPenalty(actual), score);
 
     return clamp(score, 0, 100);
   }
@@ -182,6 +192,11 @@ public class FingerPrintService {
         && !baseline.os().equalsIgnoreCase(current.os())) {
 
       score -= 60;
+
+      log.info(
+          "Adaptive score penalty. OS changed. baseline={} current={} penalty=60",
+          baseline.os(),
+          current.os());
     }
 
     if (isPresent(baseline.browser())
@@ -189,6 +204,11 @@ public class FingerPrintService {
         && !baseline.browser().equalsIgnoreCase(current.browser())) {
 
       score -= 15;
+
+      log.info(
+          "Adaptive score penalty. Browser changed. baseline={} current={} penalty=15",
+          baseline.browser(),
+          current.browser());
     }
 
     if (isPresent(baseline.screenResolution())
@@ -196,12 +216,27 @@ public class FingerPrintService {
         && !baseline.screenResolution().equalsIgnoreCase(current.screenResolution())) {
 
       score -= 10;
+
+      log.info(
+          "Adaptive score penalty. Screen changed. baseline={} current={} penalty=10",
+          baseline.screenResolution(),
+          current.screenResolution());
     }
 
     if (isPresent(baseline.osVersion()) && isPresent(current.osVersion())) {
 
-      score -= osVersionPenalty(baseline.osVersion(), current.osVersion());
+      int penalty = osVersionPenalty(baseline.osVersion(), current.osVersion());
+
+      score -= penalty;
+
+      log.info(
+          "Adaptive score penalty. OS version changed. baseline={} current={} penalty={}",
+          baseline.osVersion(),
+          current.osVersion(),
+          penalty);
     }
+
+    log.info("Adaptive score result={}", Math.max(0, score));
 
     return Math.max(0, score);
   }
@@ -209,19 +244,42 @@ public class FingerPrintService {
   public boolean shouldUpdateBaseline(FingerPrint baseline, FingerPrint current) {
 
     if (!current.DID().equals(baseline.DID())) {
+
+      log.info(
+          "Baseline update rejected. DID mismatch. baselineDid={} currentDid={}",
+          baseline.DID(),
+          current.DID());
+
       return false;
     }
 
     int baselineQuality = getQuality(baseline);
     int currentQuality = getQuality(current);
 
+    log.info(
+        "Baseline update check. baselineQuality={} currentQuality={}",
+        baselineQuality,
+        currentQuality);
+
     if (currentQuality > baselineQuality) {
+
+      log.info(
+          "Baseline update accepted. Quality improved from {} to {}",
+          baselineQuality,
+          currentQuality);
+
       return true;
     }
 
     int changeScore = calculateAdaptiveChangeScore(baseline, current);
 
-    return changeScore >= 80;
+    log.info("Baseline adaptive comparison. changeScore={} threshold=80", changeScore);
+
+    boolean result = changeScore >= 80;
+
+    log.info("Baseline update decision={}", result);
+
+    return result;
   }
 
   public boolean canReplaceBaseline(FingerPrint baseline, FingerPrint current) {

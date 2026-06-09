@@ -19,7 +19,7 @@ public class SessionSpecifications {
   }
 
   public static Specification<Session> hasState(SessionState state) {
-    return (root, query, builder) -> builder.equal(root.get("state").as(SessionState.class), state);
+    return (root, query, builder) -> builder.equal(root.get("state"), state);
   }
 
   public static Specification<Session> hasCreatedAt(LocalDateTime createdAt) {

@@ -1,6 +1,7 @@
 package com.Market.MeatShop.Shared;
 
 import com.Market.MeatShop.Shared.Exceptions.*;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -45,6 +46,26 @@ public class GlobalExceptionHandler {
                 "The service is temporarily unavailable. Please try again later.",
                 503,
                 LocalDateTime.now()));
+  }
+
+  @ExceptionHandler(ExpiredJwtException.class)
+  public ResponseEntity<?> handleExpiredJwtException(ExpiredJwtException ex) {
+
+    log.warn("ERROR : access token expired {}", ex.getMessage());
+
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .body(
+            new ErrorResponse(
+                "The access token has expired refresh it or re log in", 401, LocalDateTime.now()));
+  }
+
+  @ExceptionHandler(SessionExpiredException.class)
+  public ResponseEntity<?> handleSessionExpiredException(SessionExpiredException ex) {
+
+    log.warn("ERROR : try access to expired session {}", ex.getMessage());
+
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(new ErrorResponse(ex.getMessage(), 403, LocalDateTime.now()));
   }
 
   @ExceptionHandler(SessionNotFoundException.class)

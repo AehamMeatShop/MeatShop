@@ -44,6 +44,13 @@ public class JwtProvider {
   }
 
   public Claims parseToken(String token) {
+
+    if (token == null) {
+      throw new JwtException("Token is null");
+    }
+
+    token = token.trim();
+
     return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token).getPayload();
   }
 
@@ -76,11 +83,11 @@ public class JwtProvider {
   }
 
   public SecuritySubjectType extractType(String token) {
-    return parseToken(token).get("partyType", SecuritySubjectType.class);
+    return SecuritySubjectType.valueOf(parseToken(token).get("pt", String.class));
   }
 
   public Long extractSessionId(String token) {
-    return parseToken(token).get("sessionId", Long.class);
+    return parseToken(token).get("sid", Long.class);
   }
 
   public String extractTokenType(String token) {

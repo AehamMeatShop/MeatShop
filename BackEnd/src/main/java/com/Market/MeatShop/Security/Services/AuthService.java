@@ -6,18 +6,17 @@ import com.Market.MeatShop.Security.Assemblers.SecuritySubjectProvider;
 import com.Market.MeatShop.Security.Assemblers.SecuritySubjectRegistry;
 import com.Market.MeatShop.Security.DTOs.FingerPrint;
 import com.Market.MeatShop.Security.DTOs.Requests.LoginRequest;
+import com.Market.MeatShop.Security.DTOs.Requests.RefreshRequest;
 import com.Market.MeatShop.Security.DTOs.Responses.LoginResponse;
 import com.Market.MeatShop.Security.Entities.LoginIndex;
 import com.Market.MeatShop.Security.Entities.Session;
+import com.Market.MeatShop.Security.Enums.SecuritySubjectType;
 import com.Market.MeatShop.Security.Enums.SessionState;
 import com.Market.MeatShop.Security.Providers.JwtProvider;
 import com.Market.MeatShop.Security.Repositories.LoginIndexRepo;
 import com.Market.MeatShop.Security.Repositories.SessionRepo;
 import com.Market.MeatShop.Security.SecurityWeb.Dto.AuthContext;
-import com.Market.MeatShop.Shared.Exceptions.AccountNotFounException;
-import com.Market.MeatShop.Shared.Exceptions.LoginFaildException;
-import com.Market.MeatShop.Shared.Exceptions.SessionStolenException;
-import com.Market.MeatShop.Shared.Exceptions.SessionNotFoundException;
+import com.Market.MeatShop.Shared.Exceptions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,6 +40,7 @@ public class AuthService {
   private final Base64.Encoder Bencoder = Base64.getUrlEncoder().withoutPadding();
   private final JwtProvider jwtProvider;
   private final SessionRepo sessionRepo;
+  private final SessionService sessionService;
 
   public AuthService(
       SecuritySubjectRegistry secSubRegestry,
@@ -49,7 +49,8 @@ public class AuthService {
       PasswordEncoder encoder,
       FingerPrintService fingerPrintServic,
       JwtProvider jwtProvider,
-      SessionRepo sessionRepo) {
+      SessionRepo sessionRepo,
+      SessionService sessionService) {
     this.secSubRegestry = secSubRegestry;
     this.secSubFactory = secSubFactory;
     this.loginIndexRepo = loginIndexRepo;
@@ -57,6 +58,7 @@ public class AuthService {
     this.fingerPrintService = fingerPrintServic;
     this.jwtProvider = jwtProvider;
     this.sessionRepo = sessionRepo;
+    this.sessionService = sessionService;
   }
 
   public String generateRefreshToken() {
@@ -79,14 +81,14 @@ public class AuthService {
     if (index.isEmpty()) {
       log.warn("login with email {} which is not indexed on the system", loginRequest.email());
       throw new AccountNotFounException(
-          "Account with email " + loginRequest.email() + " not found");
+          "Account with email " + loginRequest.email() + " not indexed yet");
     }
 
     SecuritySubjectProvider provider = secSubRegestry.getProvider(index.get().getSubjectType());
 
     SecurityIdentity identity = provider.getSubject(index.get().getSubjectId());
 
-    if (authContext.did() == null || authContext.did().isEmpty()) {
+    if (authContext.sid() == null) {
       if (!encoder.matches(loginRequest.password(), identity.password())) {
         log.warn(
             "login field to Account with email {} , account type : {} ",
@@ -129,7 +131,7 @@ public class AuthService {
       sessionRepo.save(session);
       String accessToken = jwtProvider.generateAccessToken(identity, session.getId());
 
-      LoginResponse response = new LoginResponse(accessToken, refreshToken, did);
+      LoginResponse response = new LoginResponse(accessToken, refreshToken, did, session.getId());
 
       log.info("Logging successfully ! with email {}  and password login  ", loginRequest.email());
 
@@ -138,28 +140,13 @@ public class AuthService {
 
     Session session =
         sessionRepo
-            .findFirstByBaseLineFingerPrintContainingAndPartyIdAndPartyType(
-                authContext.did(), identity.id(), identity.type())
+            .findByIdAndPartyIdAndPartyType(authContext.sid(), identity.id(), identity.type())
             .orElseThrow(
                 () ->
                     new SessionNotFoundException(
                         "session not found for " + authContext.did(), identity));
-    if (session.getState().equals(SessionState.OBSERVED)
-        || session.getState().equals(SessionState.CHALLENGED)) {
-      log.info(
-          "the session : {} is : {} and try to login via E : {} and P",
-          session.getId(),
-          session.getState(),
-          identity.email());
-    } else if (session.getState().equals(SessionState.STOLEN)) {
-      log.info(
-          "the session : {} is : {} and try to login via E : {} and P",
-          session.getId(),
-          session.getState(),
-          identity.email());
 
-      throw new SessionStolenException("try to access to stolen session   ", identity);
-    }
+    sessionService.traceSession(session, identity, authContext, ip);
 
     if (!encoder.matches(loginRequest.password(), identity.password())) {
       log.warn(
@@ -168,19 +155,6 @@ public class AuthService {
           identity.type());
       throw new LoginFaildException(
           "Account with email " + loginRequest.email() + " Field with wrong password");
-    }
-    if (session.getState().equals(SessionState.REVOKED)) {
-      log.info(
-          "the session : {} is : {} and try to login via E : {} and P",
-          session.getId(),
-          session.getState(),
-          identity.email());
-      throw new LoginFaildException(
-          "the session { "
-              + session.getId()
-              + " } with email { "
-              + loginRequest.email()
-              + "} is revoked ");
     }
 
     FingerPrint baseFingerPrint =
@@ -206,12 +180,23 @@ public class AuthService {
       boolean shouldIUpdateBFP =
           fingerPrintService.canReplaceBaseline(baseFingerPrint, contextFingerPrint);
       if (shouldIUpdateBFP) {
-        session.setBaseLineFingerPrint(fingerPrintService.serialize(contextFingerPrint));
+
         log.info(
-            "fingerprint  for session : {} will updated : {} trust score : {}",
+            """
+                Baseline fingerprint updated
+                sessionId={}
+                oldBaseline={}
+                newBaseline={}
+                oldQuality={}
+                newQuality={}
+                """,
             session.getId(),
+            fingerPrintService.serialize(baseFingerPrint),
             fingerPrintService.serialize(contextFingerPrint),
-            newTrustScore);
+            fingerPrintService.getQuality(baseFingerPrint),
+            fingerPrintService.getQuality(contextFingerPrint));
+
+        session.setBaseLineFingerPrint(fingerPrintService.serialize(contextFingerPrint));
       }
     }
     session.setState(fingerPrintService.getSuitableSessionState(newTrustScore));
@@ -219,13 +204,112 @@ public class AuthService {
     String refreshToken = generateRefreshToken();
     String hashedRefToken = encoder.encode(refreshToken);
     session.setRefreshToken(hashedRefToken);
-
+    session.setExpireAt(LocalDateTime.now().plusDays(15));
     sessionRepo.save(session);
     String accessToken = jwtProvider.generateAccessToken(identity, session.getId());
+
     log.info(
         "logging successfully via E and P for the session : {} by trust score : {}",
         session.getId(),
         newTrustScore);
-    return new LoginResponse(accessToken, session.getRefreshToken(), authContext.did());
+    return new LoginResponse(accessToken, refreshToken, authContext.did(), session.getId());
+  }
+
+  public boolean logOut(String accessToken, AuthContext authContext, String ip) {
+
+    Long sessionId = jwtProvider.extractSessionId(accessToken);
+    Long partyId = jwtProvider.extractPartyId(accessToken);
+    SecuritySubjectType partyType = jwtProvider.extractType(accessToken);
+
+    SecuritySubjectProvider provider = secSubRegestry.getProvider(partyType);
+
+    SecurityIdentity identity = provider.getSubject(partyId);
+
+    Session session =
+        sessionRepo
+            .findByIdAndPartyIdAndPartyType(sessionId, identity.id(), identity.type())
+            .orElseThrow(() -> new SessionNotFoundException("Session not found", identity));
+
+    if (session.getExpireAt().isBefore(LocalDateTime.now())) {
+      throw new SessionExpiredException(
+          "Session { " + session.getId() + " } expired at : " + session.getExpireAt());
+    }
+
+    sessionService.traceSession(session, identity, authContext, ip);
+    FingerPrint baseFingerPrint =
+        fingerPrintService.toFingerPrint(session.getBaseLineFingerPrint());
+    log.info("Base fingerprint: {}", baseFingerPrint);
+    FingerPrint contextFingerPrint =
+        new FingerPrint(
+            ip,
+            authContext.did(),
+            authContext.screenResolution(),
+            authContext.os(),
+            authContext.osVersion(),
+            authContext.browser());
+    log.info("last fingerPrint fingerprint: {}", contextFingerPrint);
+    int newTrustScore = fingerPrintService.getTrustScore(baseFingerPrint, contextFingerPrint);
+
+    session.setLastFingerprint(fingerPrintService.serialize(contextFingerPrint));
+    session.setTrustScore(newTrustScore);
+    if (newTrustScore < 30) {
+
+      log.warn("Suspicious logout attempt — sessionId: {}", session.getId());
+    }
+    session.setState(SessionState.INACTIVE);
+    session.setExpireAt(LocalDateTime.now());
+
+    sessionRepo.save(session);
+
+    return true;
+  }
+
+  @Transactional
+  public LoginResponse refreshToken(
+      RefreshRequest refreshRequest, AuthContext authContext, String ip) {
+    log.info("Refresh token requested");
+
+    String hashedRefToken = encoder.encode(refreshRequest.refreshToken());
+
+    Session session =
+        sessionRepo
+            .findById(refreshRequest.sessionId())
+            .orElseThrow(() -> new SessionNotFoundException("Invalid refresh token", null));
+
+    if (session.getExpireAt().isBefore(LocalDateTime.now())) {
+      throw new SessionExpiredException(
+          "Session { " + session.getId() + " } expired at : " + session.getExpireAt());
+    }
+
+    SecuritySubjectProvider provider = secSubRegestry.getProvider(session.getPartyType());
+    SecurityIdentity identity = provider.getSubject(session.getPartyId());
+    sessionService.traceSession(session, identity, authContext, ip);
+    FingerPrint contextFingerPrint =
+        new FingerPrint(
+            ip,
+            authContext.did(),
+            authContext.screenResolution(),
+            authContext.os(),
+            authContext.osVersion(),
+            authContext.browser());
+
+    FingerPrint baseFingerPrint =
+        fingerPrintService.toFingerPrint(session.getBaseLineFingerPrint());
+    int newTrustScore = fingerPrintService.getTrustScore(baseFingerPrint, contextFingerPrint);
+
+    session.setLastFingerprint(fingerPrintService.serialize(contextFingerPrint));
+    session.setTrustScore(newTrustScore);
+    session.setState(fingerPrintService.getSuitableSessionState(newTrustScore));
+
+    String newRefreshToken = generateRefreshToken();
+    String newHashedRefToken = encoder.encode(newRefreshToken);
+    session.setRefreshToken(newHashedRefToken);
+    session.setExpireAt(LocalDateTime.now().plusDays(15));
+    sessionRepo.save(session);
+
+    String accessToken = jwtProvider.generateAccessToken(identity, session.getId());
+
+    log.info("Token refreshed successfully for session: {}", session.getId());
+    return new LoginResponse(accessToken, newRefreshToken, authContext.did(), session.getId());
   }
 }

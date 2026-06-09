@@ -19,6 +19,11 @@ public interface SessionRepo
 
   List<Session> findByPartyId(Long partyId);
 
+  Optional<Session> findByIdAndPartyIdAndPartyType(
+      Long id, Long partyId, SecuritySubjectType partyType);
+
   Optional<Session> findFirstByBaseLineFingerPrintContainingAndPartyIdAndPartyType(
       String value, Long partyId, SecuritySubjectType partyType);
+
+  Optional<Session> findByRefreshToken(String refreshTokenHash);
 }

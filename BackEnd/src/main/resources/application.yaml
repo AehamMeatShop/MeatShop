@@ -58,13 +58,24 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,prometheus
+        include: health,prometheus,metrics,info
+  metrics:
+    export:
+      prometheus:
+        enabled: true
   endpoint:
     health:
       show-details: always
-  metrics:
-    tags:
-      application: MeatShop
+    prometheus:
+      enabled: true
+
+spring:
+  application:
+    name: MeatShop
+
+  spring:
+    application:
+      name: MeatShop
 security:
   jwt:
     secret: ${JWT_SECRET:er3ZIZpjuQ6NMg7ef/Ieed9szbvKwWkeq+cEwG13fYA=}

@@ -379,7 +379,7 @@
       "pluginVersion": "10.4.2",
       "targets": [
         {
-          "expr": "up{job=\"meat-shop\"}",
+          "expr": "up{job=\"MeatShop\"}",
           "refId": "A"
         }
       ],
@@ -542,12 +542,12 @@
       "pluginVersion": "10.4.2",
       "targets": [
         {
-          "expr": "process_resident_memory_bytes{job=\"meat-shop\"}",
+          "expr": "process_resident_memory_bytes{job=\"MeatShop\"}",
           "refId": "A",
           "legendFormat": "Backend Memory"
         },
         {
-          "expr": "jvm_memory_used_bytes{job=\"meat-shop\"}",
+          "expr": "jvm_memory_used_bytes{job=\"MeatShop\"}",
           "refId": "B",
           "legendFormat": "JVM Memory Used"
         }

@@ -2,5 +2,12 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/BackEnd/src/main/resources/db/migration/V17__create_sequences.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/BackEnd/src/main/resources/db/migration/V18__create_sessions_table.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/BackEnd/src/main/resources/db/migration/V19__create_roles_table.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/BackEnd/src/main/resources/db/migration/V20__create_authorities_table.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/BackEnd/src/main/resources/db/migration/V23__create_party_roles_table.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/BackEnd/src/main/resources/db/migration/V24__create_login_indexes_table.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/BackEnd/src/main/resources/db/migration/V25__add_column_expire_at_to_seesions_table.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/BackEnd/src/main/resources/db/migration/V26__remove_device_id_from_sessions_table.sql" dialect="PostgreSQL" />
   </component>
 </project>

@@ -26,28 +26,28 @@ public class RoleController {
     this.roleService = roleService;
   }
 
-  @PreAuthorize("hasAuthority('ROLE_MANAGEMENT')")
+  @PreAuthorize("hasAuthority('ROLE_ASSIGNMENT')")
   @PostMapping
   public ResponseEntity<RoleViewDto> createRole(@Valid @RequestBody CreateRoleRequest request) {
     RoleViewDto createdRole = roleService.createRole(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(createdRole);
   }
 
-  @PreAuthorize("hasAuthority('ROLE_MANAGEMENT')")
+  @PreAuthorize("hasAuthority('ROLE_ASSIGNMENT')")
   @GetMapping
   public ResponseEntity<List<RoleViewDto>> getAllRoles() {
     List<RoleViewDto> roles = roleService.getAllRoles();
     return ResponseEntity.ok(roles);
   }
 
-  @PreAuthorize("hasAuthority('ROLE_MANAGEMENT')")
+  @PreAuthorize("hasAuthority('ROLE_ASSIGNMENT')")
   @GetMapping("/{id}")
   public ResponseEntity<RoleViewDto> getRoleById(@PathVariable Long id) {
     RoleViewDto role = roleService.getRoleById(id);
     return ResponseEntity.ok(role);
   }
 
-  @PreAuthorize("hasAuthority('ROLE_MANAGEMENT')")
+  @PreAuthorize("hasAuthority('ROLE_ASSIGNMENT')")
   @PutMapping("/{id}")
   public ResponseEntity<RoleViewDto> updateRole(
       @PathVariable Long id, @Valid @RequestBody UpdateRoleRequest request) {
@@ -55,14 +55,14 @@ public class RoleController {
     return ResponseEntity.ok(updatedRole);
   }
 
-  @PreAuthorize("hasAuthority('ROLE_MANAGEMENT')")
+  @PreAuthorize("hasAuthority('ROLE_ASSIGNMENT')")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteRole(@PathVariable Long id) {
     roleService.deleteRole(id);
     return ResponseEntity.noContent().build();
   }
 
-  @PreAuthorize("hasAuthority('ROLE_MANAGEMENT')")
+  @PreAuthorize("hasAuthority('ROLE_ASSIGNMENT')")
   @GetMapping("/party")
   public ResponseEntity<List<RoleViewDto>> getRolesByParty(
       @RequestParam SecuritySubjectType partyType, @RequestParam Long partyId) {
@@ -70,14 +70,14 @@ public class RoleController {
     return ResponseEntity.ok(roles);
   }
 
-  @PreAuthorize("hasAuthority('ROLE_MANAGEMENT')")
+  @PreAuthorize("hasAuthority('ROLE_ASSIGNMENT')")
   @GetMapping("/{roleId}/authorities")
   public ResponseEntity<List<AuthorityViewDto>> getAuthoritiesByRole(@PathVariable Long roleId) {
     List<AuthorityViewDto> authorities = roleService.getAuthoritiesByRole(roleId);
     return ResponseEntity.ok(authorities);
   }
 
-  @PreAuthorize("hasAuthority('ROLE_MANAGEMENT')")
+  @PreAuthorize("hasAuthority('ROLE_ASSIGNMENT')")
   @PostMapping("/assign-to-party")
   public ResponseEntity<PartyRoleViewDto> assignRoleToParty(
       @Valid @RequestBody AssignRoleToPartyRequest request) {
@@ -85,7 +85,7 @@ public class RoleController {
     return ResponseEntity.status(HttpStatus.CREATED).body(partyRole);
   }
 
-  @PreAuthorize("hasAuthority('ROLE_MANAGEMENT')")
+  @PreAuthorize("hasAuthority('ROLE_ASSIGNMENT')")
   @PostMapping("/{roleId}/authorities/{authorityId}")
   public ResponseEntity<Void> assignAuthorityToRole(
       @PathVariable Long roleId, @PathVariable Long authorityId) {
@@ -93,7 +93,7 @@ public class RoleController {
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
-  @PreAuthorize("hasAuthority('ROLE_MANAGEMENT')")
+  @PreAuthorize("hasAuthority('ROLE_ASSIGNMENT')")
   @DeleteMapping("/remove-from-party")
   public ResponseEntity<Void> removeRoleFromParty(
       @RequestParam SecuritySubjectType partyType,

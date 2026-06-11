@@ -3,12 +3,14 @@ package com.Market.MeatShop.Security.Controllers;
 import com.Market.MeatShop.Security.DTOs.AuthorityViewDto;
 import com.Market.MeatShop.Security.DTOs.PartyAuthorityViewDto;
 import com.Market.MeatShop.Security.DTOs.Requests.AssignAuthorityToPartyRequest;
+import com.Market.MeatShop.Security.DTOs.Requests.CreateAuthorityRequest;
 import com.Market.MeatShop.Security.Enums.SecuritySubjectType;
 import com.Market.MeatShop.Security.Services.AuthorityService;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,6 +23,7 @@ public class AuthorityController {
     this.authorityService = authorityService;
   }
 
+  @PreAuthorize("hasAuthority('AUTHORITY_ASSIGNMENT')")
   @GetMapping("/party")
   public ResponseEntity<?> getAuthoritiesByParty(
       @RequestParam SecuritySubjectType partyType, @RequestParam Long partyId) {
@@ -28,6 +31,7 @@ public class AuthorityController {
     return ResponseEntity.ok(authorityService.getAuthoritiesByParty(partyType, partyId));
   }
 
+  @PreAuthorize("hasAuthority('AUTHORITY_ASSIGNMENT')")
   @PostMapping("/assign-to-party")
   public ResponseEntity<PartyAuthorityViewDto> assignAuthorityToParty(
       @Valid @RequestBody AssignAuthorityToPartyRequest request) {
@@ -35,6 +39,7 @@ public class AuthorityController {
     return ResponseEntity.status(HttpStatus.CREATED).body(partyAuthority);
   }
 
+  @PreAuthorize("hasAuthority('AUTHORITY_ASSIGNMENT')")
   @DeleteMapping("/remove-from-party")
   public ResponseEntity<Void> removeAuthorityFromParty(
       @RequestParam SecuritySubjectType partyType,
@@ -44,10 +49,19 @@ public class AuthorityController {
     return ResponseEntity.noContent().build();
   }
 
+  @PreAuthorize("hasAuthority('AUTHORITY_ASSIGNMENT')")
   @DeleteMapping("/remove-from-role")
   public ResponseEntity<Void> removeAuthorityFromRole(
       @RequestParam Long roleId, @RequestParam Long authorityId) {
     authorityService.removeAuthorityFromRole(roleId, authorityId);
     return ResponseEntity.noContent().build();
+  }
+
+  @PreAuthorize("hasAuthority('AUTHORITY_ASSIGNMENT')")
+  @PostMapping
+  public ResponseEntity<AuthorityViewDto> createAuthority(
+      @Valid @RequestBody CreateAuthorityRequest request) {
+    AuthorityViewDto authority = authorityService.createAuthority(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(authority);
   }
 }

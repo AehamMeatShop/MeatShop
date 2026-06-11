@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,12 +30,14 @@ public class ProductController {
     return ResponseEntity.ok().build();
   }
 
+  @PreAuthorize("isAuthenticated()")
   @GetMapping
   public ResponseEntity<?> getAllProducts() {
     log.info("GET /products requested");
     return ResponseEntity.status(HttpStatus.OK).body(productService.findAllProducts());
   }
 
+  @PreAuthorize("hasAuthority('PRODUCT_MANAGEMENT')")
   @PostMapping("")
   public ResponseEntity<?> createProduct(
       @Valid @RequestBody ProductCreateRequest productCreateRequest) {
@@ -43,6 +46,7 @@ public class ProductController {
         .body(productService.createProduct(productCreateRequest));
   }
 
+  @PreAuthorize("hasAuthority('PRODUCT_MANAGEMENT')")
   @PutMapping("/{id}")
   public ResponseEntity<?> updateProduct(
       @Valid @RequestBody ProductUpdateRequest productUpdateRequest, @PathVariable long id) {
@@ -51,6 +55,7 @@ public class ProductController {
         .body(productService.updateProduct(productUpdateRequest, id));
   }
 
+  @PreAuthorize("hasAuthority('PRODUCT_MANAGEMENT')")
   @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteProduct(@PathVariable long id) {
     log.info("DELETE /products/{} requested", id);

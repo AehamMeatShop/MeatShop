@@ -21,13 +21,18 @@ import com.Market.MeatShop.Parties.QueryRoles.PartyQueryRoles;
 import com.Market.MeatShop.Parties.Services.PartyContactService;
 import com.Market.MeatShop.Parties.Services.PartyService;
 
+import com.Market.MeatShop.Security.DTOs.Requests.AssignRoleToPartyRequest;
+import com.Market.MeatShop.Security.DTOs.Requests.CreateAuthorityRequest;
+import com.Market.MeatShop.Security.DTOs.RoleViewDto;
 import com.Market.MeatShop.Security.Enums.SecuritySubjectType;
 
+import com.Market.MeatShop.Security.Services.AuthService;
 import com.Market.MeatShop.Security.Services.AuthorityService;
 import com.Market.MeatShop.Security.Services.LoginIndexService;
 import com.Market.MeatShop.Security.Services.RoleService;
 import com.Market.MeatShop.Shared.Exceptions.PasswordCompromisedException;
 import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
+import com.Market.MeatShop.Utils.SystemAuthorities;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -55,6 +60,7 @@ public class EmployeeService {
   private final RoleService roleService;
   private final LoginIndexService loginIndexService;
   private final AuthorityService authorityService;
+  private final AuthService authService;
 
   public EmployeeService(
       EmployeeRepo employeeRepo,
@@ -65,7 +71,8 @@ public class EmployeeService {
       CompromisedPasswordChecker dPc,
       RoleService roleService,
       LoginIndexService loginIndexService,
-      AuthorityService authorityService) {
+      AuthorityService authorityService,
+      AuthService authService) {
     this.employeeRepo = employeeRepo;
     this.employeeMapper = employeeMapper;
     this.partyService = partyService;
@@ -75,6 +82,7 @@ public class EmployeeService {
     this.roleService = roleService;
     this.loginIndexService = loginIndexService;
     this.authorityService = authorityService;
+    this.authService = authService;
   }
 
   @Transactional
@@ -300,5 +308,60 @@ public class EmployeeService {
         new PageImpl<>(result, employeesPage.getPageable(), employeesPage.getTotalElements());
     log.info("employees returned {}", resultPage.getContent());
     return resultPage;
+  }
+
+  @Transactional
+  public EmployeeViewDTO startApplication(CreateEmployeeReq req) {
+    log.info("Attempting to sart application by create employee with email: {}", req.email());
+
+    CreatePartyRequest partyReq =
+        new CreatePartyRequest(req.name(), req.address(), PartyType.EMPLOYEE);
+
+    CompromisedPasswordDecision decision = dPc.check(req.password());
+    if (decision.isCompromised()) {
+      throw new PasswordCompromisedException("password is compromised");
+    }
+
+    Long partyId = partyService.createParty(partyReq).id();
+    log.info("Party created with id: {}", partyId);
+
+    Employee emp = new Employee();
+    emp.setEmail(req.email());
+    emp.setPassword(encoder.encode(req.password()));
+    emp.setSalary(req.salary());
+    emp.setStatus(req.status());
+    emp.setPartyId(partyId);
+    employeeRepo.save(emp);
+    log.info("Employee saved with id: {}", emp.getId());
+
+    boolean indexCreated =
+        loginIndexService.createIndex(emp.getId(), SecuritySubjectType.EMPLOYEE, req.email());
+    log.info("Login index creation result: {} for email: {}", indexCreated, req.email());
+
+    if (!indexCreated) {
+      log.error(
+          "Failed to create login index for email: {}, rolling back employee creation",
+          req.email());
+      throw new RuntimeException("Failed to create login index");
+    }
+    authService.startSecurityApplication();
+    RoleViewDto superAdminRole = roleService.getRoleByName("SUPER_ADMIN");
+    if (superAdminRole == null) {
+      throw new TargetNotFound("SUPER_ADMIN role not found cannot start application");
+    }
+    roleService.assignRoleToParty(
+        new AssignRoleToPartyRequest(
+            SecuritySubjectType.EMPLOYEE, emp.getId(), superAdminRole.id()));
+
+    List<String> systemAuthorites =
+        Arrays.stream(SystemAuthorities.values()).map(SystemAuthorities::name).toList();
+
+    for (String authority : systemAuthorites) {
+      authorityService.createAuthority(new CreateAuthorityRequest(authority));
+    }
+
+    EmployeeViewDTO resp = employeeMapper.toEmployeeViewDTO(emp);
+    log.info("employee created successfully and application started succesfolly  {}", resp);
+    return resp;
   }
 }

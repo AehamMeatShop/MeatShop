@@ -3,6 +3,7 @@ package com.Market.MeatShop.Security.Services;
 import com.Market.MeatShop.Security.DTOs.AuthorityViewDto;
 import com.Market.MeatShop.Security.DTOs.PartyAuthorityViewDto;
 import com.Market.MeatShop.Security.DTOs.Requests.AssignAuthorityToPartyRequest;
+import com.Market.MeatShop.Security.DTOs.Requests.CreateAuthorityRequest;
 import com.Market.MeatShop.Security.Entities.Authority;
 import com.Market.MeatShop.Security.Entities.PartyAuthority;
 import com.Market.MeatShop.Security.Entities.RoleAuthority;
@@ -135,9 +136,17 @@ public class AuthorityService {
   }
 
   public void removeAllAuthoritiesForParty(SecuritySubjectType partyType, Long partyId) {
-    List<PartyAuthority> partyAuthorities = 
+    List<PartyAuthority> partyAuthorities =
         partyAuthorityRepo.findByPartyTypeAndPartyId(partyType, partyId);
     partyAuthorityRepo.deleteAll(partyAuthorities);
     log.info("Removed all authorities for party {} of type {}", partyId, partyType);
+  }
+
+  public AuthorityViewDto createAuthority(CreateAuthorityRequest request) {
+    Authority authority = new Authority();
+    authority.setAuthority(request.authority());
+    authority = authorityRepo.save(authority);
+    log.info("Created authority: {}", request.authority());
+    return authorityMapper.toViewDto(authority);
   }
 }

@@ -10,6 +10,7 @@ import jdk.jfr.Registered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -33,7 +34,8 @@ public class AuthController {
         .body(authService.login(loginRequest, authContext, ip));
   }
 
-  @GetMapping("/logOut")
+  @PreAuthorize("isAuthenticated()")
+  @GetMapping("/log-out")
   public ResponseEntity<?> logOut(HttpServletRequest request, AuthContext authContext) {
     String ip = request.getRemoteAddr();
     String authHeader = request.getHeader("Authorization");

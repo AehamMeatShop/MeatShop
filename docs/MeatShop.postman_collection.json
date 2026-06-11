@@ -14,13 +14,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/employees/health-check",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "employees",
-                "health-check"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", "health-check"]
             }
           }
         },
@@ -31,7 +26,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstName\": \"string\",\n  \"lastName\": \"string\",\n  \"email\": \"string\",\n  \"phoneNumber\": \"string\",\n  \"hireDate\": \"2024-01-01\",\n  \"position\": \"string\",\n  \"salary\": 0\n}",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"address\": \"123 Main St\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"salary\": 50000,\n  \"status\": \"ACTIVE\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -40,12 +35,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/employees",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "employees"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["employees"]
             }
           }
         },
@@ -56,7 +47,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"employeeId\": 0,\n  \"contactType\": \"EMAIL\",\n  \"contactValue\": \"string\"\n}",
+              "raw": "{\n  \"employeeId\": 1,\n  \"method\": \"EMAIL\",\n  \"identifier\": \"john@example.com\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -65,13 +56,29 @@
             },
             "url": {
               "raw": "{{baseUrl}}/employees/contact",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "employees",
-                "contact"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", "contact"]
+            }
+          }
+        },
+        {
+          "name": "Start Application",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jane Smith\",\n  \"address\": \"456 Oak Ave\",\n  \"email\": \"jane@example.com\",\n  \"password\": \"password123\",\n  \"salary\": 45000,\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/employees/start-application",
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", "start-application"]
             }
           }
         },
@@ -82,7 +89,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstName\": \"string\",\n  \"lastName\": \"string\",\n  \"email\": \"string\",\n  \"phoneNumber\": \"string\",\n  \"position\": \"string\",\n  \"salary\": 0\n}",
+              "raw": "{\n  \"name\": \"John Updated\",\n  \"address\": \"789 New St\",\n  \"email\": \"john.updated@example.com\",\n  \"password\": \"newpassword123\",\n  \"salary\": 60000,\n  \"status\": \"ACTIVE\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -91,13 +98,8 @@
             },
             "url": {
               "raw": "{{baseUrl}}/employees/:id",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "employees",
-                ":id"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -114,13 +116,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/employees/:id",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "employees",
-                ":id"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -137,13 +134,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/employees/:id",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "employees",
-                ":id"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["employees", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -160,12 +152,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/employees?page=0&size=10",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "employees"
-              ],
+              "host": ["{{baseUrl}}"],
+              "path": ["employees"],
               "query": [
                 {
                   "key": "page",
@@ -194,14 +182,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/parties/contacts/health-check",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "parties",
-                    "contacts",
-                    "health-check"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["parties", "contacts", "health-check"]
                 }
               }
             },
@@ -212,7 +194,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"partyId\": 0,\n  \"contactType\": \"EMAIL\",\n  \"contactValue\": \"string\"\n}",
+                  "raw": "{\n  \"partyId\": 1,\n  \"method\": \"EMAIL\",\n  \"identifier\": \"party@example.com\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -221,13 +203,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/parties/contacts",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "parties",
-                    "contacts"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["parties", "contacts"]
                 }
               }
             },
@@ -238,7 +215,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"contactType\": \"EMAIL\",\n  \"contactValue\": \"string\"\n}",
+                  "raw": "{\n  \"method\": \"EMAIL\",\n  \"identifier\": \"updated@example.com\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -247,14 +224,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/parties/contacts/:id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "parties",
-                    "contacts",
-                    ":id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["parties", "contacts", ":id"],
                   "variable": [
                     {
                       "key": "id",
@@ -271,14 +242,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/parties/contacts/:id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "parties",
-                    "contacts",
-                    ":id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["parties", "contacts", ":id"],
                   "variable": [
                     {
                       "key": "id",
@@ -300,13 +265,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/parties/health-check",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "parties",
-                    "health-check"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["parties", "health-check"]
                 }
               }
             },
@@ -317,7 +277,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"string\",\n  \"partyType\": \"CUSTOMER\"\n}",
+                  "raw": "{\n  \"partyName\": \"Acme Corp\",\n  \"partyAddress\": \"456 Business Ave\",\n  \"partyType\": \"CUSTOMER\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -326,12 +286,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/parties",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "parties"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["parties"]
                 }
               }
             },
@@ -342,13 +298,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/parties/filter?page=0&size=10",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "parties",
-                    "filter"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["parties", "filter"],
                   "query": [
                     {
                       "key": "page",
@@ -369,13 +320,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/parties/:id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "parties",
-                    ":id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["parties", ":id"],
                   "variable": [
                     {
                       "key": "id",
@@ -392,7 +338,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"name\": \"string\",\n  \"partyType\": \"CUSTOMER\"\n}",
+                  "raw": "{\n  \"partyName\": \"Updated Corp\",\n  \"partyAddress\": \"789 New St\",\n  \"partyType\": \"SUPPLIER\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -401,13 +347,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/parties/:id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "parties",
-                    ":id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["parties", ":id"],
                   "variable": [
                     {
                       "key": "id",
@@ -424,13 +365,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/parties/:id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "parties",
-                    ":id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["parties", ":id"],
                   "variable": [
                     {
                       "key": "id",
@@ -457,7 +393,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"categoryName\": \"string\",\n  \"description\": \"string\"\n}",
+                  "raw": "{\n  \"name\": \"Beef\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -466,12 +402,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/categories",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "categories"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["categories"]
                 }
               }
             },
@@ -482,13 +414,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/categories/health-check",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "categories",
-                    "health-check"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["categories", "health-check"]
                 }
               }
             },
@@ -499,12 +426,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/categories",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "categories"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["categories"]
                 }
               }
             },
@@ -515,13 +438,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/categories/:id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "categories",
-                    ":id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["categories", ":id"],
                   "variable": [
                     {
                       "key": "id",
@@ -538,7 +456,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"categoryName\": \"string\",\n  \"description\": \"string\"\n}",
+                  "raw": "{\n  \"name\": \"Pork\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -547,13 +465,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/categories/:id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "categories",
-                    ":id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["categories", ":id"],
                   "variable": [
                     {
                       "key": "id",
@@ -570,13 +483,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/categories/:id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "categories",
-                    ":id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["categories", ":id"],
                   "variable": [
                     {
                       "key": "id",
@@ -598,13 +506,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/components/health-check",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "components",
-                    "health-check"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["components", "health-check"]
                 }
               }
             },
@@ -615,14 +518,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/components/product/:id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "components",
-                    "product",
-                    ":id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["components", "product", ":id"],
                   "variable": [
                     {
                       "key": "id",
@@ -639,7 +536,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"productId\": 0,\n  \"components\": [\n    {\n      \"componentId\": 0,\n      \"quantity\": 0\n    }\n  ]\n}",
+                  "raw": "{\n  \"parentProductId\": 1,\n  \"components\": [\n    {\n      \"ratioInKg\": 0.5,\n      \"componentProductID\": 2\n    }\n  ]\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -648,12 +545,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/components",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "components"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["components"]
                 }
               }
             },
@@ -664,13 +557,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/components/:prod-id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "components",
-                    ":prod-id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["components", ":prod-id"],
                   "variable": [
                     {
                       "key": "prod-id",
@@ -692,13 +580,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/products/health-check",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "products",
-                    "health-check"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "health-check"]
                 }
               }
             },
@@ -709,12 +592,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/products",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "products"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products"]
                 }
               }
             },
@@ -725,7 +604,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"productName\": \"string\",\n  \"productType\": \"MEAT\",\n  \"description\": \"string\",\n  \"categoryId\": 0\n}",
+                  "raw": "{\n  \"productName\": \"Ribeye Steak\",\n  \"categoryId\": 1,\n  \"description\": \"Premium cut\",\n  \"productType\": \"SIMPLE\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -734,12 +613,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/products",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "products"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products"]
                 }
               }
             },
@@ -750,7 +625,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"productName\": \"string\",\n  \"productType\": \"MEAT\",\n  \"description\": \"string\",\n  \"categoryId\": 0\n}",
+                  "raw": "{\n  \"productName\": \"Sirloin Steak\",\n  \"categoryId\": 1,\n  \"description\": \"Premium cut\",\n  \"productType\": \"SIMPLE\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -759,13 +634,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/products/:id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "products",
-                    ":id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", ":id"],
                   "variable": [
                     {
                       "key": "id",
@@ -782,13 +652,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/products/:id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "products",
-                    ":id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", ":id"],
                   "variable": [
                     {
                       "key": "id",
@@ -805,13 +670,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/products/filter?page=0&size=10",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "products",
-                    "filter"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["products", "filter"],
                   "query": [
                     {
                       "key": "page",
@@ -837,13 +697,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/stock-movements/health-check",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "stock-movements",
-                    "health-check"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["stock-movements", "health-check"]
                 }
               }
             },
@@ -854,15 +709,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/stock-movements/product/:id/stock",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "stock-movements",
-                    "product",
-                    ":id",
-                    "stock"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["stock-movements", "product", ":id", "stock"],
                   "variable": [
                     {
                       "key": "id",
@@ -879,7 +727,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"productId\": 0,\n  \"quantity\": 0,\n  \"type\": \"IN\",\n  \"reason\": \"string\"\n}",
+                  "raw": "{\n  \"type\": \"ADJUSTMENT\",\n  \"productId\": 1,\n  \"quantity\": 10.5,\n  \"notes\": \"Stock adjustment\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -888,12 +736,92 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/stock-movements",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "stock-movements"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["stock-movements"]
+                }
+              }
+            },
+            {
+              "name": "Purchase Product Stock",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"PURCHASE\",\n  \"productId\": 1,\n  \"quantity\": 100.0,\n  \"componentId\": 1,\n  \"notes\": \"New purchase\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/stock-movements",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["stock-movements"]
+                }
+              }
+            },
+            {
+              "name": "Sell Product Stock",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"SELL\",\n  \"productId\": 1,\n  \"quantity\": 5.0,\n  \"componentId\": 1,\n  \"behavior\": \"SIMPLE\",\n  \"notes\": \"Customer sale\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/stock-movements",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["stock-movements"]
+                }
+              }
+            },
+            {
+              "name": "Waste Product Stock",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"WASTE\",\n  \"productId\": 1,\n  \"quantity\": 2.5,\n  \"notes\": \"Expired stock\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/stock-movements",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["stock-movements"]
+                }
+              }
+            },
+            {
+              "name": "Transform Product Stock",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"TRANSFORM\",\n  \"inputs\": {\n    \"1\": 10.0,\n    \"2\": 5.0\n  },\n  \"outputs\": {\n    \"3\": 15.0\n  },\n  \"notes\": \"Meat processing\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/stock-movements",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["stock-movements"]
                 }
               }
             }
@@ -905,8 +833,93 @@
       "name": "Security",
       "item": [
         {
+          "name": "Authentication",
+          "item": [
+            {
+              "name": "Login",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "login"]
+                }
+              }
+            },
+            {
+              "name": "Logout",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/log-out",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "log-out"]
+                }
+              }
+            },
+            {
+              "name": "Refresh Token",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"your-refresh-token\",\n  \"sessionId\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/refresh",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "refresh"]
+                }
+              }
+            }
+          ]
+        },
+        {
           "name": "Authorities",
           "item": [
+            {
+              "name": "Create Authority",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"authority\": \"EMPLOYEE_MANAGEMENT\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/authorities",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "authorities"]
+                }
+              }
+            },
             {
               "name": "Get Authorities By Party",
               "request": {
@@ -914,14 +927,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/auth/authorities/party?partyType=EMPLOYEE&partyId=1",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "authorities",
-                    "party"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "authorities", "party"],
                   "query": [
                     {
                       "key": "partyType",
@@ -942,7 +949,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"partyType\": \"EMPLOYEE\",\n  \"partyId\": 0,\n  \"authorityId\": 0\n}",
+                  "raw": "{\n  \"partyType\": \"EMPLOYEE\",\n  \"partyId\": 1,\n  \"authorityId\": 1\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -951,14 +958,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/auth/authorities/assign-to-party",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "authorities",
-                    "assign-to-party"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "authorities", "assign-to-party"]
                 }
               }
             },
@@ -969,14 +970,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/auth/authorities/remove-from-party?partyType=EMPLOYEE&partyId=1&authorityId=1",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "authorities",
-                    "remove-from-party"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "authorities", "remove-from-party"],
                   "query": [
                     {
                       "key": "partyType",
@@ -1001,14 +996,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/auth/authorities/remove-from-role?roleId=1&authorityId=1",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "authorities",
-                    "remove-from-role"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "authorities", "remove-from-role"],
                   "query": [
                     {
                       "key": "roleId",
@@ -1034,7 +1023,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"roleName\": \"string\",\n  \"description\": \"string\"\n}",
+                  "raw": "{\n  \"name\": \"ADMIN\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1043,13 +1032,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/auth/roles",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "roles"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "roles"]
                 }
               }
             },
@@ -1060,13 +1044,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/auth/roles",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "roles"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "roles"]
                 }
               }
             },
@@ -1077,14 +1056,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/auth/roles/:id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "roles",
-                    ":id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "roles", ":id"],
                   "variable": [
                     {
                       "key": "id",
@@ -1101,7 +1074,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"roleName\": \"string\",\n  \"description\": \"string\"\n}",
+                  "raw": "{\n  \"name\": \"SUPER_ADMIN\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1110,14 +1083,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/auth/roles/:id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "roles",
-                    ":id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "roles", ":id"],
                   "variable": [
                     {
                       "key": "id",
@@ -1134,14 +1101,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/auth/roles/:id",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "roles",
-                    ":id"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "roles", ":id"],
                   "variable": [
                     {
                       "key": "id",
@@ -1158,14 +1119,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/auth/roles/party?partyType=EMPLOYEE&partyId=1",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "roles",
-                    "party"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "roles", "party"],
                   "query": [
                     {
                       "key": "partyType",
@@ -1186,15 +1141,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/auth/roles/:roleId/authorities",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "roles",
-                    ":roleId",
-                    "authorities"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "roles", ":roleId", "authorities"],
                   "variable": [
                     {
                       "key": "roleId",
@@ -1211,7 +1159,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"partyType\": \"EMPLOYEE\",\n  \"partyId\": 0,\n  \"roleId\": 0\n}",
+                  "raw": "{\n  \"partyType\": \"EMPLOYEE\",\n  \"partyId\": 1,\n  \"roleId\": 1\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1220,14 +1168,8 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/auth/roles/assign-to-party",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "roles",
-                    "assign-to-party"
-                  ]
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "roles", "assign-to-party"]
                 }
               }
             },
@@ -1238,16 +1180,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/auth/roles/:roleId/authorities/:authorityId",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "roles",
-                    ":roleId",
-                    "authorities",
-                    ":authorityId"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "roles", ":roleId", "authorities", ":authorityId"],
                   "variable": [
                     {
                       "key": "roleId",
@@ -1268,14 +1202,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/auth/roles/remove-from-party?partyType=EMPLOYEE&partyId=1&roleId=1",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "roles",
-                    "remove-from-party"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "roles", "remove-from-party"],
                   "query": [
                     {
                       "key": "partyType",
@@ -1305,13 +1233,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/auth/sessions?page=0&size=10",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "sessions"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "sessions"],
                   "query": [
                     {
                       "key": "page",
@@ -1332,15 +1255,8 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/auth/sessions/:id/state?state=ACTIVE",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "auth",
-                    "sessions",
-                    ":id",
-                    "state"
-                  ],
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "sessions", ":id", "state"],
                   "query": [
                     {
                       "key": "state",
@@ -1357,40 +1273,6 @@
               }
             }
           ]
-        },
-        {
-          "name": "Test Security Subject",
-          "item": [
-            {
-              "name": "Get Security Subject",
-              "request": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{baseUrl}}/test/security-subject/:id/:type",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    "test",
-                    "security-subject",
-                    ":id",
-                    ":type"
-                  ],
-                  "variable": [
-                    {
-                      "key": "id",
-                      "value": "1"
-                    },
-                    {
-                      "key": "type",
-                      "value": "EMPLOYEE"
-                    }
-                  ]
-                }
-              }
-            }
-          ]
         }
       ]
     }
@@ -1398,7 +1280,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:8080"
+      "value": "{{baseUrl}}"
     }
   ]
 }

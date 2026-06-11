@@ -6,6 +6,7 @@ import com.Market.MeatShop.Security.Services.LoginIndexService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +20,7 @@ public class LoginIndexController {
     this.loginIndexService = loginIndexService;
   }
 
+  @PreAuthorize("hasAuthority('INDEXING')")
   @PostMapping
   public ResponseEntity<Boolean> createIndex(@Valid @RequestBody CreateLoginIndexRequest req) {
     log.info("POST /auth/login-indexes requested with email: {}", req.email());
@@ -26,6 +28,7 @@ public class LoginIndexController {
     return ResponseEntity.ok(result);
   }
 
+  @PreAuthorize("hasAuthority('INDEXING')")
   @PutMapping("/email")
   public ResponseEntity<Boolean> updateEmail(@Valid @RequestBody UpdateLoginIndexEmailRequest req) {
     log.info(

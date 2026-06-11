@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class StockMovementController {
     return ResponseEntity.ok().build();
   }
 
+  @PreAuthorize("isAuthenticated()")
   @GetMapping("/product/{id}/stock")
   public ResponseEntity<?> getCurrentProduct(@PathVariable Long id) {
     log.info("GET /stock-movements/product/{}/stock requested", id);
@@ -37,6 +39,7 @@ public class StockMovementController {
         .body(stockMovementService.getCurrentStockOfProd(id));
   }
 
+  @PreAuthorize("hasAuthority('STOCK_MANAGEMENT')")
   @PostMapping("")
   public ResponseEntity<?> adjustmentProdStock2(@Valid @RequestBody BaseStockMoveReq req) {
     log.info("POST /stock-movements {} requested", req);

@@ -23,7 +23,7 @@ public interface PartyAuthorityRepo extends JpaRepository<PartyAuthority, Long> 
       @Param("partyType") SecuritySubjectType partyType, @Param("partyId") Long partyId);
 
   @Query(
-      "SELECT DISTINCT pa.authority.authority FROM PartyAuthority pa WHERE pa.partyType = :partyType AND pa.partyId = :partyId")
+      "SELECT DISTINCT pa.authority FROM PartyAuthority pa WHERE pa.partyType = :partyType AND pa.partyId = :partyId")
   List<Authority> findAuthorityByPartyTypeAndPartyId(
       @Param("partyType") SecuritySubjectType partyType, @Param("partyId") Long partyId);
 

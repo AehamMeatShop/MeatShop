@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -32,6 +33,17 @@ public class GlobalExceptionHandler {
 
     return ResponseEntity.status(HttpStatus.FORBIDDEN)
         .body(new ErrorResponse(ex.getMessage(), 403, LocalDateTime.now()));
+  }
+
+  // AuthorizationDeniedException
+
+  @ExceptionHandler(AuthorizationDeniedException.class)
+  public ResponseEntity<?> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
+
+    log.warn("ERROR : Un Authorized action  {}", ex.getMessage());
+
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .body(new ErrorResponse("Un Authorized", 401, LocalDateTime.now()));
   }
 
   @ExceptionHandler(SessionStolenException.class)

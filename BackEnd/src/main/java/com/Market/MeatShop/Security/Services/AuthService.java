@@ -5,11 +5,14 @@ import com.Market.MeatShop.Security.Assemblers.SecuritySubjectFactory;
 import com.Market.MeatShop.Security.Assemblers.SecuritySubjectProvider;
 import com.Market.MeatShop.Security.Assemblers.SecuritySubjectRegistry;
 import com.Market.MeatShop.Security.DTOs.FingerPrint;
+import com.Market.MeatShop.Security.DTOs.Requests.CreateAuthorityRequest;
+import com.Market.MeatShop.Security.DTOs.Requests.CreateRoleRequest;
 import com.Market.MeatShop.Security.DTOs.Requests.LoginRequest;
 import com.Market.MeatShop.Security.DTOs.Requests.RefreshRequest;
 import com.Market.MeatShop.Security.DTOs.Responses.LoginResponse;
 import com.Market.MeatShop.Security.Entities.LoginIndex;
 import com.Market.MeatShop.Security.Entities.Session;
+import com.Market.MeatShop.Security.Enums.SecurityAuthorities;
 import com.Market.MeatShop.Security.Enums.SecuritySubjectType;
 import com.Market.MeatShop.Security.Enums.SessionState;
 import com.Market.MeatShop.Security.Providers.JwtProvider;
@@ -17,22 +20,22 @@ import com.Market.MeatShop.Security.Repositories.LoginIndexRepo;
 import com.Market.MeatShop.Security.Repositories.SessionRepo;
 import com.Market.MeatShop.Security.SecurityWeb.Dto.AuthContext;
 import com.Market.MeatShop.Shared.Exceptions.*;
+import com.Market.MeatShop.Utils.SystemAuthorities;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Array;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
 public class AuthService {
   private final SecuritySubjectRegistry secSubRegestry;
-  private final SecuritySubjectFactory secSubFactory;
+
   private final LoginIndexRepo loginIndexRepo;
   private final PasswordEncoder encoder;
   private final FingerPrintService fingerPrintService;
@@ -41,24 +44,28 @@ public class AuthService {
   private final JwtProvider jwtProvider;
   private final SessionRepo sessionRepo;
   private final SessionService sessionService;
+  private final RoleService roleService;
+  private final AuthorityService authorityService;
 
   public AuthService(
       SecuritySubjectRegistry secSubRegestry,
-      SecuritySubjectFactory secSubFactory,
       LoginIndexRepo loginIndexRepo,
       PasswordEncoder encoder,
       FingerPrintService fingerPrintServic,
       JwtProvider jwtProvider,
       SessionRepo sessionRepo,
-      SessionService sessionService) {
+      SessionService sessionService,
+      RoleService roleService,
+      AuthorityService authorityService) {
     this.secSubRegestry = secSubRegestry;
-    this.secSubFactory = secSubFactory;
     this.loginIndexRepo = loginIndexRepo;
     this.encoder = encoder;
     this.fingerPrintService = fingerPrintServic;
     this.jwtProvider = jwtProvider;
     this.sessionRepo = sessionRepo;
     this.sessionService = sessionService;
+    this.authorityService = authorityService;
+    this.roleService = roleService;
   }
 
   public String generateRefreshToken() {
@@ -311,5 +318,18 @@ public class AuthService {
 
     log.info("Token refreshed successfully for session: {}", session.getId());
     return new LoginResponse(accessToken, newRefreshToken, authContext.did(), session.getId());
+  }
+
+  @Transactional
+  public void startSecurityApplication() {
+    roleService.createRole(new CreateRoleRequest("SUPER_ADMIN"));
+    log.info("SUPER_ADMIN role created");
+    List<String> securityAuthorities =
+        Arrays.stream(SecurityAuthorities.values()).map(SecurityAuthorities::name).toList();
+
+    for (String authority : securityAuthorities) {
+      authorityService.createAuthority(new CreateAuthorityRequest(authority));
+    }
+    log.info("security authorities created");
   }
 }

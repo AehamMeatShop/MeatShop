@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,6 +26,7 @@ public class ProductComponentController {
     return ResponseEntity.ok().build();
   }
 
+  @PreAuthorize("isAuthenticated()")
   @GetMapping("/product/{id}")
   public ResponseEntity<?> getProdCompsById(@PathVariable long id) {
     log.info("GET /components/product/{} requested", id);
@@ -32,6 +34,7 @@ public class ProductComponentController {
     return ResponseEntity.status(HttpStatus.OK).body(productComponentService.findProdComps(id));
   }
 
+  @PreAuthorize("hasAuthority('PRODUCT_MANAGEMENT')")
   @PostMapping
   public ResponseEntity<?> createProductComponent(
       @Valid @RequestBody CreateProdCompsRequest createProdCompsRequest) {
@@ -40,6 +43,7 @@ public class ProductComponentController {
         .body(productComponentService.createProductComponentList(createProdCompsRequest));
   }
 
+  @PreAuthorize("hasAuthority('PRODUCT_MANAGEMENT')")
   @DeleteMapping("/{prod-id}")
   public ResponseEntity<?> deleteProductComponent(@PathVariable("prod-id") long id) {
     log.info("DELETE /components/{} requested", id);

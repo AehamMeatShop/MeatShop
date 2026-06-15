@@ -23,6 +23,7 @@ public class PartyController {
     this.partyService = partyService;
   }
 
+  @PreAuthorize("permitAll()")
   @GetMapping("/health-check")
   public ResponseEntity<?> healthCheck() {
     log.info("GET /parties/health-check requested");

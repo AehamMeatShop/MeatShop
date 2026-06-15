@@ -23,6 +23,7 @@ public class ProductController {
     this.productService = productService;
   }
 
+  @PreAuthorize("permitAll()")
   @GetMapping("/health-check")
   public ResponseEntity<?> healthCheck() {
 

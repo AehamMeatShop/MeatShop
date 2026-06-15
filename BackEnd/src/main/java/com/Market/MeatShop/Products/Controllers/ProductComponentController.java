@@ -20,6 +20,7 @@ public class ProductComponentController {
     this.productComponentService = productComponentService;
   }
 
+  @PreAuthorize("permitAll()")
   @GetMapping("/health-check")
   public ResponseEntity<?> healthCheck() {
     log.info("GET /components/helth-check requested");

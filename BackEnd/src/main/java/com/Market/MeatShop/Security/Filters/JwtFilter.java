@@ -94,8 +94,9 @@ public class JwtFilter extends OncePerRequestFilter {
     sessionService.traceSession(session, identity, authContext, request.getRemoteAddr());
     if (session.getState().equals(SessionState.INACTIVE)
         || session.getExpireAt().isBefore(LocalDateTime.now())) {
-      filterChain.doFilter(request, response);
+
       log.info("session is inactive or expired");
+      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
       return;
     }
     SecuritySubject securitySubject = securitySubjectFactory.assemble(identity);

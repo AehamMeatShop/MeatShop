@@ -25,7 +25,7 @@ public class SecurityConfig {
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/auth/login", "auth/refresh")
+                auth.requestMatchers("/auth/login", "auth/refresh", "*/health-check")
                     .permitAll()
                     .requestMatchers("/employees/start-application")
                     .permitAll()

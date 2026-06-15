@@ -33,6 +33,7 @@ public class CategoryController {
     return ResponseEntity.status(HttpStatus.CREATED).body(categoryViewDTO);
   }
 
+  @PreAuthorize("permitAll()")
   @GetMapping("/health-check")
   public ResponseEntity<?> healthCheck() {
     log.info("GET /categories/health-check requested");

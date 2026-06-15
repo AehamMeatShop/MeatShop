@@ -23,6 +23,7 @@ public class EmployeeController {
     this.employeeService = employeeService;
   }
 
+  @PreAuthorize("permitAll()")
   @GetMapping("/health-check")
   public ResponseEntity<?> healthCheck() {
     log.info("GET /employees/health-check requested");

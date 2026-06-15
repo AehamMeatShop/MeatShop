@@ -70,3 +70,6 @@ security:
     secret: ${JWT_SECRET:er3ZIZpjuQ6NMg7ef/Ieed9szbvKwWkeq+cEwG13fYA=}
     access-token-expiry: 900
     refresh-token-expiry: 604800
+instance:
+  id: ${INSTANCE_ID:1}
+  name: ${INSTANCE_NAME:Server}

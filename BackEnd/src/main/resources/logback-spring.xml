@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
     <springProfile name="prod">
         <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder class="net.logstash.logback.encoder.LogstashEncoder">
@@ -9,6 +7,9 @@
                 <includeMdcKeyName>ip</includeMdcKeyName>
                 <includeMdcKeyName>method</includeMdcKeyName>
                 <includeMdcKeyName>endpoint</includeMdcKeyName>
+                <includeMdcKeyName>instanceId</includeMdcKeyName>
+                <includeMdcKeyName>hostname</includeMdcKeyName>
+                <includeMdcKeyName>instanceName</includeMdcKeyName>
             </encoder>
         </appender>
         <root level="INFO">
@@ -19,12 +20,13 @@
     <springProfile name="dev">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
-                <pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} [rid=%X{requestId}] [ip=%X{ip}] - %msg%n</pattern>
+                <pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} [rid=%X{requestId}] [in=%X{instanceName}]
+                    [iid=%X{instanceId}] - %msg%n
+                </pattern>
             </encoder>
         </appender>
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
         </root>
     </springProfile>
-
 </configuration>

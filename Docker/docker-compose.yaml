@@ -53,7 +53,8 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: ${REDIS_PORT}
       JWT_SECRET: ${JWT_SECRET}
-
+      INSTANCE_ID: 1
+      INSTANCE_NAME: Main
     ports:
       - "8080:8080"
 
@@ -63,7 +64,35 @@ services:
 
     networks:
       - meat_shop_network
+  backend-2:
+    image:
+      aehamalhaeak/meat_shop:${BACKEND_VERSION}
+    container_name: meat_shop_backend_2
 
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+
+      DB_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      SPRING_WEB_LOG_LEVEL: ${SPRING_WEB_LOG_LEVEL}
+      SPRING_SECURITY_LOG_LEVEL: ${SPRING_SECURITY_LOG_LEVEL}
+      SPRING_HIBERNATE_LOG_LEVEL: ${SPRING_HIBERNATE_LOG_LEVEL}
+      SPRING_MEAT_SHOP_LOG_LEVEL: ${SPRING_MEAT_SHOP_LOG_LEVEL}
+      REDIS_HOST: redis
+      REDIS_PORT: ${REDIS_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      INSTANCE_ID: 1
+      INSTANCE_NAME: Backup
+    ports:
+      - "8081:8080"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    networks:
+      - meat_shop_network
   loki:
     image: grafana/loki:3.0.0
     container_name: meat_shop_loki

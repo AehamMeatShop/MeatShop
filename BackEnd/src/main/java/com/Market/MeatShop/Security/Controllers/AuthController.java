@@ -28,7 +28,7 @@ public class AuthController {
       @RequestBody @Valid LoginRequest loginRequest,
       AuthContext authContext,
       HttpServletRequest request) {
-    String ip = request.getRemoteAddr();
+    String ip = request.getHeader("X-Real-IP");
 
     return ResponseEntity.status(HttpStatus.ACCEPTED)
         .body(authService.login(loginRequest, authContext, ip));
@@ -37,7 +37,7 @@ public class AuthController {
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/log-out")
   public ResponseEntity<?> logOut(HttpServletRequest request, AuthContext authContext) {
-    String ip = request.getRemoteAddr();
+    String ip = request.getHeader("X-Real-IP");
     String authHeader = request.getHeader("Authorization");
 
     // Extract pure token from "Bearer <token>"
@@ -54,7 +54,7 @@ public class AuthController {
       @RequestBody @Valid RefreshRequest refreshRequest,
       AuthContext authContext,
       HttpServletRequest request) {
-    String ip = request.getRemoteAddr();
+    String ip = request.getHeader("X-Real-IP");
     return ResponseEntity.status(HttpStatus.ACCEPTED)
         .body(authService.refreshToken(refreshRequest, authContext, ip));
   }

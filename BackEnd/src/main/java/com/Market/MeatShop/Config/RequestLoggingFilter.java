@@ -4,15 +4,33 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.UUID;
 
+@Slf4j
 @Component
 public class RequestLoggingFilter extends OncePerRequestFilter {
+  @Value("${instance.id:unknown}")
+  private String instanceId;
+
+  @Value("${instance.name:Server}")
+  private String instanceName;
+
+  @EventListener(ApplicationReadyEvent.class)
+  public void initializeMdc() {
+    MDC.put("instanceId", instanceId);
+    MDC.put("instanceName", instanceName);
+
+    log.info("MeatShop started with instance: {} ({})", instanceId, instanceName);
+  }
 
   @Override
   protected void doFilterInternal(
@@ -25,7 +43,8 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
     MDC.put("ip", request.getRemoteAddr());
     MDC.put("method", request.getMethod());
     MDC.put("endpoint", request.getRequestURI());
-
+    MDC.put("instanceId", instanceId);
+    MDC.put("instanceName", instanceName);
     try {
       filterChain.doFilter(request, response);
     } finally {

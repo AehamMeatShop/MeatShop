@@ -25,9 +25,14 @@ public class SecurityConfig {
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/auth/login", "auth/refresh", "*/health-check")
-                    .permitAll()
-                    .requestMatchers("/employees/start-application")
+                auth.requestMatchers(
+                        "/auth/login",
+                        "/auth/refresh",
+                        "/employees/start-application",
+                        "/actuator/health",
+                        "*/health-check",
+                        "/actuator/prometheus",
+                        "/actuator/info")
                     .permitAll()
                     .anyRequest()
                     .authenticated())

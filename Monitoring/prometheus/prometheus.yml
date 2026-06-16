@@ -4,9 +4,10 @@ global:
 
 scrape_configs:
 
-  - job_name: 'MeatShop'
+  - job_name: 'meat-shop'
     static_configs:
       - targets: [ 'backend:8080' ]
+      - targets: [ 'backend-2:8080' ]
     metrics_path: '/actuator/prometheus'
     scrape_interval: 10s
     scrape_timeout: 5s

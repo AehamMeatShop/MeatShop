@@ -24,14 +24,6 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
   @Value("${instance.name:Server}")
   private String instanceName;
 
-  @EventListener(ApplicationReadyEvent.class)
-  public void initializeMdc() {
-    MDC.put("instanceId", instanceId);
-    MDC.put("instanceName", instanceName);
-
-    log.info("MeatShop started with instance: {} ({})", instanceId, instanceName);
-  }
-
   @Override
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

@@ -20,8 +20,7 @@
     <springProfile name="dev">
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
-                <pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} [rid=%X{requestId}] [in=%X{instanceName}]
-                    [iid=%X{instanceId}] - %msg%n
+                <pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} [rid:%X{requestId}] - %msg%n
                 </pattern>
             </encoder>
         </appender>

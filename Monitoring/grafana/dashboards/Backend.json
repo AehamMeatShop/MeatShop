@@ -15,7 +15,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 7,
+  "id": 8,
   "links": [],
   "panels": [
     {
@@ -807,6 +807,6 @@
   "timezone": "browser",
   "title": "MeatShop Observability Dashboard",
   "uid": "dfpb3cjqniyv4c",
-  "version": 5,
+  "version": 1,
   "weekStart": ""
 }

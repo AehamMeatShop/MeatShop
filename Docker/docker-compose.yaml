@@ -113,9 +113,13 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+      - /var/log/nginx:/var/log/nginx:ro
     command: [ "run", "--storage.path=/var/lib/alloy/data", "/etc/alloy/config.alloy" ]
     networks:
       - meat_shop_network
+
+
+
   node-exporter:
     image: prom/node-exporter:latest
     container_name: meat_shop_node_exporter

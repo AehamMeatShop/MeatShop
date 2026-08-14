@@ -276,8 +276,6 @@ public class AuthService {
       RefreshRequest refreshRequest, AuthContext authContext, String ip) {
     log.info("Refresh token requested");
 
-    String hashedRefToken = encoder.encode(refreshRequest.refreshToken());
-
     Session session =
         sessionRepo
             .findById(refreshRequest.sessionId())
@@ -286,6 +284,10 @@ public class AuthService {
     if (session.getExpireAt().isBefore(LocalDateTime.now())) {
       throw new SessionExpiredException(
           "Session { " + session.getId() + " } expired at : " + session.getExpireAt());
+    }
+    if(!encoder.matches(refreshRequest.refreshToken(), session.getRefreshToken())){
+      log.warn("try to refresh the session {} via wrong refresh token", session.getId());
+      throw new SessionExpiredException("Invalid refresh token");
     }
 
     SecuritySubjectProvider provider = secSubRegestry.getProvider(session.getPartyType());

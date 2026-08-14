@@ -15,13 +15,13 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "id": 8,
+  "id": 11,
   "links": [],
   "panels": [
     {
       "datasource": {
         "type": "loki",
-        "uid": "fflrm11v7xs74e"
+        "uid": "ffm2fbe4nde68a"
       },
       "description": "",
       "fieldConfig": {
@@ -52,7 +52,8 @@
                   "{level=\"WARN\", service=\"backend_2\"}",
                   "{level=\"info\", service=\"postgres\"}",
                   "{level=\"info\", service=\"redis\"}",
-                  "{level=\"warn\", service=\"redis\"}"
+                  "{level=\"warn\", service=\"redis\"}",
+                  "{level=\"info\", service=\"nginx\"}"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -102,7 +103,7 @@
         {
           "datasource": {
             "type": "loki",
-            "uid": "fflrm11v7xs74e"
+            "uid": "ffm2fbe4nde68a"
           },
           "editorMode": "code",
           "expr": "sum by(service, level) (\n  count_over_time(\n    {application=\"MeatShop\"}[5m]\n  )\n)",
@@ -117,7 +118,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "fflrkagl26znka"
+        "uid": "ffm2fajiu5reob"
       },
       "fieldConfig": {
         "defaults": {
@@ -169,7 +170,7 @@
             "uid": "fflrkagl26znka"
           },
           "editorMode": "code",
-          "expr": "(\n  sum(rate(http_server_requests_seconds_count{status=~\"5..\"}[5m]))\n  /\n  sum(rate(http_server_requests_seconds_count[5m]))\n) * 100",
+          "expr": "(\n  sum(rate(http_server_requests_seconds_count{status=~\"5..\"}[5m]))\n  /\n  sum(rate(http_server_requests_seconds_count[5m]))\n) * 100 ",
           "range": true,
           "refId": "A"
         }
@@ -180,7 +181,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "fflrkagl26znka"
+        "uid": "ffm2fajiu5reob"
       },
       "fieldConfig": {
         "defaults": {
@@ -263,7 +264,7 @@
             "uid": "fflrkagl26znka"
           },
           "editorMode": "code",
-          "expr": "avg by (instance_name) (process_cpu_usage * 100)",
+          "expr": "avg by (instance_name) (process_cpu_usage * 100) ",
           "range": true,
           "refId": "A"
         }
@@ -274,7 +275,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "fflrkagl26znka"
+        "uid": "ffm2fajiu5reob"
       },
       "fieldConfig": {
         "defaults": {
@@ -357,7 +358,7 @@
             "uid": "fflrkagl26znka"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(\n  0.95,\n  sum by (le, instance_name)(\n    rate(http_server_requests_seconds_bucket[5m])\n  )\n)",
+          "expr": "histogram_quantile(\n  0.95,\n  sum by (le, instance_name)(\n    rate(http_server_requests_seconds_bucket[5m])\n  ) \n)",
           "range": true,
           "refId": "A"
         }
@@ -474,7 +475,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "fflrkagl26znka"
+        "uid": "ffm2fajiu5reob"
       },
       "fieldConfig": {
         "defaults": {
@@ -529,7 +530,7 @@
             "uid": "fflrkagl26znka"
           },
           "editorMode": "code",
-          "expr": "sum by(instance)(\n  rate(http_server_requests_seconds_count[1m])\n)",
+          "expr": "sum by(instance)( \n  rate(http_server_requests_seconds_count[1m])\n) ",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -787,6 +788,101 @@
       ],
       "title": "Heap Memory Usage",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ffm2fajiu5reob"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ffm2fajiu5reob"
+          },
+          "editorMode": "code",
+          "expr": "http_server_requests_seconds_count{}",
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Server Http Requests",
+      "type": "timeseries"
     }
   ],
   "refresh": "5s",
@@ -807,6 +903,6 @@
   "timezone": "browser",
   "title": "MeatShop Observability Dashboard",
   "uid": "dfpb3cjqniyv4c",
-  "version": 1,
+  "version": 6,
   "weekStart": ""
 }

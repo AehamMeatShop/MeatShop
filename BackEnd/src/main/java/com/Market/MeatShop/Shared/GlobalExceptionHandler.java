@@ -79,14 +79,16 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.FORBIDDEN)
         .body(new ErrorResponse(ex.getMessage(), 403, LocalDateTime.now()));
   }
-@ExceptionHandler(RefreshErrorException.class)
-public ResponseEntity<?> handleRefreshErrorException(RefreshErrorException ex) {
 
-  log.warn("ERROR : some thing went wrong with refresh");
+  @ExceptionHandler(RefreshErrorException.class)
+  public ResponseEntity<?> handleRefreshErrorException(RefreshErrorException ex) {
 
-  return ResponseEntity.status(HttpStatus.FORBIDDEN)
-          .body(new ErrorResponse(ex.getMessage(), 403, LocalDateTime.now()));
-}
+    log.warn("ERROR : some thing went wrong with refresh");
+
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(new ErrorResponse(ex.getMessage(), 403, LocalDateTime.now()));
+  }
+
   @ExceptionHandler(SessionNotFoundException.class)
   public ResponseEntity<?> handleSessionNotFoundException(SessionNotFoundException ex) {
 

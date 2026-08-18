@@ -285,7 +285,7 @@ public class AuthService {
       throw new SessionExpiredException(
           "Session { " + session.getId() + " } expired at : " + session.getExpireAt());
     }
-    if(!encoder.matches(refreshRequest.refreshToken(), session.getRefreshToken())){
+    if (!encoder.matches(refreshRequest.refreshToken(), session.getRefreshToken())) {
       log.warn("try to refresh the session {} via wrong refresh token", session.getId());
       throw new SessionExpiredException("Invalid refresh token");
     }

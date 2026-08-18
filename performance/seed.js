@@ -42,18 +42,24 @@ export function setup() {
   );
 
   return {
-    admin,
+    adminEmail: email,
+    adminPassword: password,
     productIds: catalog.products.map((p) => p.id),
   };
 }
 
+const vuAdmin = {};
+
 export function seedMovements(data) {
+  if (!vuAdmin.token) {
+    login(data.adminEmail, data.adminPassword, Object.assign(vuAdmin, newDevice(`seed-vu-${__VU}`)));
+  }
   const productIds = data.productIds;
   const productId = productIds[(__ITER + __VU) % productIds.length];
   const res = request(
     'POST',
     '/stock-movements',
-    data.admin,
+    vuAdmin,
     adjustmentBody(productId, `${__VU}-${__ITER}`),
     'seed-stock',
   );

@@ -66,7 +66,7 @@ jobs:
 
       - name: Build Backend Docker Image
         working-directory: BackEnd
-        run: docker pull aehamalhaeak/meat_shop:${{ steps.version.outputs.version }} .
+        run: docker pull aehamalhaeak/meat_shop:${{ steps.version.outputs.version }}
 
 
 

@@ -64,12 +64,9 @@ jobs:
         run: mvn clean install -DskipTests
 
 
-      - name: Build Backend Docker Image
+      - name: Build and Push Backend Docker Image
         working-directory: BackEnd
-        run: docker build aehamalhaeak/meat_shop:${{ steps.version.outputs.version }} .
-
-
-      - name: Push Backend Docker Image
+        run: docker build -t aehamalhaeak/meat_shop:${{ steps.version.outputs.version }} .
         run: docker push aehamalhaeak/meat_shop:${{ steps.version.outputs.version }}
 
 

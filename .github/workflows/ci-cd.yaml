@@ -67,7 +67,7 @@ jobs:
       - name: Build and Push Backend Docker Image
         working-directory: BackEnd
         run: docker build -t aehamalhaeak/meat_shop:${{ steps.version.outputs.version }} .
-        run: docker push aehamalhaeak/meat_shop:${{ steps.version.outputs.version }}
+          | docker push aehamalhaeak/meat_shop:${{ steps.version.outputs.version }}
 
 
       - name: Run Docker Compose

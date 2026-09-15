@@ -85,46 +85,30 @@ public class EmployeeService {
     this.authService = authService;
   }
 
+  // completed happy scenario
   @Transactional
   public EmployeeViewDTO createEmployee(CreateEmployeeReq req) {
-    log.info("Attempting to create employee with email: {}", req.email());
-
-    CreatePartyRequest partyReq =
-        new CreatePartyRequest(req.name(), req.address(), PartyType.EMPLOYEE);
 
     CompromisedPasswordDecision decision = dPc.check(req.password());
     if (decision.isCompromised()) {
       throw new PasswordCompromisedException("password is compromised");
     }
 
-    Long partyId = partyService.createParty(partyReq).id();
-    log.info("Party created with id: {}", partyId);
-
     Employee emp = new Employee();
     emp.setEmail(req.email());
     emp.setPassword(encoder.encode(req.password()));
     emp.setSalary(req.salary());
     emp.setStatus(req.status());
-    emp.setPartyId(partyId);
+    emp.setPartyId(req.partyId());
     employeeRepo.save(emp);
     log.info("Employee saved with id: {}", emp.getId());
-
-    boolean indexCreated =
-        loginIndexService.createIndex(emp.getId(), SecuritySubjectType.EMPLOYEE, req.email());
-    log.info("Login index creation result: {} for email: {}", indexCreated, req.email());
-
-    if (!indexCreated) {
-      log.error(
-          "Failed to create login index for email: {}, rolling back employee creation",
-          req.email());
-      throw new RuntimeException("Failed to create login index");
-    }
 
     EmployeeViewDTO resp = employeeMapper.toEmployeeViewDTO(emp);
     log.info("employee created successfully {}", resp);
     return resp;
   }
 
+  // completed happy scenario
   public PartyContactViewDTO createEmployeeContact(CreateEmpContactReq req) {
     Employee emp =
         employeeRepo

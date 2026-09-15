@@ -4,14 +4,8 @@ import com.Market.MeatShop.Security.Assemblers.SecurityIdentity;
 import lombok.Data;
 
 public class SessionNotFoundException extends RuntimeException {
-  private final SecurityIdentity identity;
 
-  public SessionNotFoundException(String message, SecurityIdentity identity) {
+  public SessionNotFoundException(String message) {
     super(message);
-    this.identity = identity;
-  }
-
-  public SecurityIdentity getIdentity() {
-    return this.identity;
   }
 }

@@ -149,9 +149,7 @@ public class AuthService {
         sessionRepo
             .findByIdAndPartyIdAndPartyType(authContext.sid(), identity.id(), identity.type())
             .orElseThrow(
-                () ->
-                    new SessionNotFoundException(
-                        "session not found for " + authContext.did(), identity));
+                () -> new SessionNotFoundException("session not found for " + authContext.did()));
 
     sessionService.traceSession(session, identity, authContext, ip);
 
@@ -235,7 +233,7 @@ public class AuthService {
     Session session =
         sessionRepo
             .findByIdAndPartyIdAndPartyType(sessionId, identity.id(), identity.type())
-            .orElseThrow(() -> new SessionNotFoundException("Session not found", identity));
+            .orElseThrow(() -> new SessionNotFoundException("Session not found"));
 
     if (session.getExpireAt().isBefore(LocalDateTime.now())) {
       throw new SessionExpiredException(
@@ -279,7 +277,7 @@ public class AuthService {
     Session session =
         sessionRepo
             .findById(refreshRequest.sessionId())
-            .orElseThrow(() -> new SessionNotFoundException("Invalid refresh token", null));
+            .orElseThrow(() -> new SessionNotFoundException("Invalid refresh token"));
 
     if (session.getExpireAt().isBefore(LocalDateTime.now())) {
       throw new SessionExpiredException(

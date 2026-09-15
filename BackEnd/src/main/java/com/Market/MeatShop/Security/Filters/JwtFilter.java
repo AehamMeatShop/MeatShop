@@ -70,39 +70,11 @@ public class JwtFilter extends OncePerRequestFilter {
     SecuritySubjectProvider provider = securitySubjectRegistry.getProvider(PartyType);
     SecurityIdentity identity = provider.getSubject(partyId);
     Long sessionId = jwtProvider.extractSessionId(token);
-    log.info("jwt filter see the Session id: {}", sessionId);
-    Session session =
-        sessionRepo
-            .findById(sessionId)
-            .orElseThrow(
-                () ->
-                    new SessionNotFoundException(
-                        "session {" + sessionId + "} not fonud", identity));
 
-    String deviceId = request.getHeader("did");
-
-    String os = request.getHeader("os");
-
-    String osVersion = request.getHeader("osVersion");
-
-    String browser = request.getHeader("browser");
-
-    String screenResolution = request.getHeader("screenResolution");
-
-    AuthContext authContext =
-        new AuthContext(sessionId, deviceId, os, osVersion, browser, screenResolution);
-    sessionService.traceSession(session, identity, authContext, request.getRemoteAddr());
-    if (session.getState().equals(SessionState.INACTIVE)
-        || session.getExpireAt().isBefore(LocalDateTime.now())) {
-
-      log.info("session is inactive or expired");
-      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-      return;
-    }
     SecuritySubject securitySubject = securitySubjectFactory.assemble(identity);
     UsernamePasswordAuthenticationToken authentication =
         new UsernamePasswordAuthenticationToken(
-            securitySubject, null, securitySubject.authorities());
+            securitySubject, sessionId, securitySubject.authorities());
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
     log.info("the security subject inter to the context subject {}", securitySubject);

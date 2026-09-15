@@ -5,6 +5,8 @@ import com.Market.MeatShop.Employees.DTOs.Requests.CreateEmployeeReq;
 import com.Market.MeatShop.Employees.DTOs.Requests.EmployeeFilterReq;
 import com.Market.MeatShop.Employees.DTOs.Requests.UpdateEmployeeProfileReq;
 import com.Market.MeatShop.Employees.Services.EmployeeService;
+import com.Market.MeatShop.Orchestas.EmploymentOrchestra;
+import com.Market.MeatShop.Orchestas.requests.OrchCreateEmpReq;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +20,12 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class EmployeeController {
   private final EmployeeService employeeService;
+  private final EmploymentOrchestra employmentOrchestra;
 
-  public EmployeeController(EmployeeService employeeService) {
+  public EmployeeController(
+      EmployeeService employeeService, EmploymentOrchestra employmentOrchestra) {
     this.employeeService = employeeService;
+    this.employmentOrchestra = employmentOrchestra;
   }
 
   @PreAuthorize("permitAll()")
@@ -32,17 +37,17 @@ public class EmployeeController {
 
   @PreAuthorize("hasAuthority('EMPLOYEE_MANAGEMENT')")
   @PostMapping
-  public ResponseEntity<?> createEmployee(@Valid @RequestBody CreateEmployeeReq req) {
+  public ResponseEntity<?> createEmployee(@Valid @RequestBody OrchCreateEmpReq req) {
     log.info("POST /employees {} requested", req);
-    return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.createEmployee(req));
+    return ResponseEntity.status(HttpStatus.CREATED).body(employmentOrchestra.createEmployee(req));
   }
 
   @PreAuthorize("hasAuthority('EMPLOYEE_MANAGEMENT')")
   @PostMapping("/contact")
-  public ResponseEntity<?> createEmployeContact(@Valid @RequestBody CreateEmpContactReq req) {
+  public ResponseEntity<?> createEmployeeContact(@Valid @RequestBody CreateEmpContactReq req) {
     log.info("POST /employees/contact {} requested", req);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(employeeService.createEmployeeContact(req));
+        .body(employmentOrchestra.createEmployeeContact(req));
   }
 
   @PreAuthorize("hasAuthority('EMPLOYEE_MANAGEMENT')")

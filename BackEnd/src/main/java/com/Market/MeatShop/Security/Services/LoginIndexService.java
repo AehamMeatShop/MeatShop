@@ -5,7 +5,7 @@ import com.Market.MeatShop.Security.Enums.SecuritySubjectType;
 import com.Market.MeatShop.Security.Repositories.LoginIndexRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.transaction.Transactional;
 
 @Service
 @Slf4j

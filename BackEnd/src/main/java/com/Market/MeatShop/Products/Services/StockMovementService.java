@@ -224,7 +224,7 @@ public class StockMovementService {
       if (product.getProductType() != ProductTypes.SERVICE) {
         if (inputEntry.getValue().compareTo(currentStock) > 0) {
           throw new IllegalArgumentException(
-              "the sold quantity cannot be greater than the current stock of product :  "
+              "the transformed quantity cannot be greater than the current stock of product :  "
                   + inputEntry.getKey()
                   + ": "
                   + inputEntry.getValue());

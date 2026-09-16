@@ -3,6 +3,7 @@ package com.Market.MeatShop.Employees.Services;
 import com.Market.MeatShop.Employees.DTOs.EmployeeFullViewDTO;
 import com.Market.MeatShop.Employees.DTOs.EmployeeViewDTO;
 import com.Market.MeatShop.Employees.DTOs.Requests.*;
+import com.Market.MeatShop.Employees.DTOs.Rsponses.EmployeeUpdateResponse;
 import com.Market.MeatShop.Employees.Entities.Employee;
 import com.Market.MeatShop.Employees.Mappers.EmployeeMapper;
 import com.Market.MeatShop.Employees.QueryRoles.EmployeeQueryRoles;
@@ -54,35 +55,21 @@ public class EmployeeService {
   private final EmployeeMapper employeeMapper;
   private final EmployeeRepo employeeRepo;
   private final PartyService partyService;
-  private final PartyContactService partyContactService;
   private final PasswordEncoder encoder;
   private final CompromisedPasswordChecker dPc;
-  private final RoleService roleService;
-  private final LoginIndexService loginIndexService;
-  private final AuthorityService authorityService;
-  private final AuthService authService;
 
   public EmployeeService(
       EmployeeRepo employeeRepo,
       EmployeeMapper employeeMapper,
       PartyService partyService,
-      PartyContactService partyContactService,
       PasswordEncoder encoder,
-      CompromisedPasswordChecker dPc,
-      RoleService roleService,
-      LoginIndexService loginIndexService,
-      AuthorityService authorityService,
-      AuthService authService) {
+      CompromisedPasswordChecker dPc) {
     this.employeeRepo = employeeRepo;
     this.employeeMapper = employeeMapper;
     this.partyService = partyService;
-    this.partyContactService = partyContactService;
+
     this.encoder = encoder;
     this.dPc = dPc;
-    this.roleService = roleService;
-    this.loginIndexService = loginIndexService;
-    this.authorityService = authorityService;
-    this.authService = authService;
   }
 
   // completed happy scenario
@@ -109,113 +96,42 @@ public class EmployeeService {
   }
 
   // completed happy scenario
-  public PartyContactViewDTO createEmployeeContact(CreateEmpContactReq req) {
-    Employee emp =
-        employeeRepo
-            .findById(req.employeeId())
-            .orElseThrow(() -> new TargetNotFound("employee not found"));
-    CreatePartyContactReq partyContactReq =
-        new CreatePartyContactReq(emp.getPartyId(), req.method(), req.identifier());
-    PartyContactViewDTO resp = partyContactService.createPartyContact(partyContactReq);
-    log.info("employee contact created {}", resp);
-    return resp;
-  }
 
   @Transactional
-  public EmployeeFullViewDTO updateEmployee(UpdateEmployeeProfileReq req, Long id) {
+  public EmployeeUpdateResponse updateEmployee(UpdateEmployeeReq req, Long id) {
     log.info("Attempting to update employee with id: {}", id);
 
     Employee emp =
         employeeRepo.findById(id).orElseThrow(() -> new TargetNotFound("employee not found"));
+    EmployeeViewDTO oldData = employeeMapper.toEmployeeViewDTO(emp);
+    emp = employeeMapper.updateFromReq(req, emp);
+    if (req.password() != null || !req.password().isEmpty()) {
 
-    String oldEmail = emp.getEmail();
-    String newEmail = req.email();
-
-    UpdatePartyResp partyResp =
-        partyService.updateParty(
-            new UpdatePartyReq(req.name(), req.address(), null), emp.getPartyId());
-
-    Long roleId = null;
-
-    UpdateEmployeeReq empUpdReq =
-        new UpdateEmployeeReq(req.email(), req.password(), req.salary(), req.status());
-
-    if (partyResp.updated()) {
-      emp = employeeMapper.updateFromReq(empUpdReq, emp);
-      employeeRepo.save(emp);
-    } else {
-      Employee originalCopy = employeeMapper.clone(emp);
-      emp = employeeMapper.updateFromReq(empUpdReq, emp);
-
-      if (EmployeeComparison.hasNoChanges(originalCopy, emp, empUpdReq)) {
-        throw new IllegalArgumentException("no changes");
-      }
-
-      employeeRepo.save(emp);
+      //      CompromisedPasswordDecision decision = dPc.check(req.password());
+      //      if (decision.isCompromised()) {
+      //        throw new PasswordCompromisedException("password is compromised");
+      //      }
+      emp.setPassword(encoder.encode(req.password()));
     }
 
-    log.info("Employee updated with id: {}", emp.getId());
+    employeeRepo.save(emp);
+    EmployeeViewDTO newData = employeeMapper.toEmployeeViewDTO(emp);
 
-    if (newEmail != null && !newEmail.equals(oldEmail)) {
-      log.info("Email changed from {} to {}, updating login index", oldEmail, newEmail);
-      boolean indexUpdated = loginIndexService.updateEmail(oldEmail, newEmail);
-      log.info(
-          "Login index update result: {} for email change from {} to {}",
-          indexUpdated,
-          oldEmail,
-          newEmail);
-
-      if (!indexUpdated) {
-        log.error(
-            "Failed to update login index for email change from {} to {}, rolling back employee update",
-            oldEmail,
-            newEmail);
-        throw new RuntimeException("Failed to update login index");
-      }
-    }
-
-    EmployeeFullViewDTO resp =
-        new EmployeeFullViewDTO(employeeMapper.toEmployeeViewDTO(emp), partyResp.partyInfo());
-    log.info("employee updated successfully {}", resp);
-    return resp;
+    log.info("employee updated successfully {}", newData);
+    return new EmployeeUpdateResponse(oldData, newData);
   }
 
   @Transactional
-  public void deleteEmployee(Long id) {
+  public EmployeeViewDTO deleteEmployee(Long id) {
     log.info("Attempting to delete employee with id: {}", id);
 
     Employee employee =
         employeeRepo.findById(id).orElseThrow(() -> new TargetNotFound("employee not found"));
+    EmployeeViewDTO deletedProfile = employeeMapper.toEmployeeViewDTO(employee);
 
-    log.info("Checking if employee has SUPER_ADMIN role");
-    boolean isSuperAdmin =
-        roleService.partyHasSuperAdminRole(SecuritySubjectType.EMPLOYEE, employee.getId());
-
-    if (isSuperAdmin) {
-      log.error("Cannot delete employee with SUPER_ADMIN role");
-      throw new IllegalArgumentException("Cannot delete employee with SUPER_ADMIN role");
-    }
-
-    String email = employee.getEmail();
-    log.info("Deleting login index for email: {}", email);
-    boolean indexDeleted = loginIndexService.deleteIndex(email);
-    log.info("Login index deletion result: {} for email: {}", indexDeleted, email);
-
-    if (!indexDeleted) {
-      log.error(
-          "Failed to delete login index for email: {}, rolling back employee deletion", email);
-      throw new TargetNotFound("Failed to delete login index");
-    }
-
-    log.info("Deleting party roles for employee id: {}", employee.getId());
-    roleService.removeAllRolesForParty(SecuritySubjectType.EMPLOYEE, employee.getId());
-
-    log.info("Deleting party authorities for employee id: {}", employee.getId());
-    authorityService.removeAllAuthoritiesForParty(SecuritySubjectType.EMPLOYEE, employee.getId());
-
-    partyService.deleteParty(employee.getPartyId());
     employeeRepo.delete(employee);
     log.info("employee deleted successfully {}", id);
+    return deletedProfile;
   }
 
   public EmployeeFullViewDTO getEmployeeById(Long id) {
@@ -292,60 +208,5 @@ public class EmployeeService {
         new PageImpl<>(result, employeesPage.getPageable(), employeesPage.getTotalElements());
     log.info("employees returned {}", resultPage.getContent());
     return resultPage;
-  }
-
-  @Transactional
-  public EmployeeViewDTO startApplication(CreateEmployeeReq req) {
-    log.info("Attempting to sart application by create employee with email: {}", req.email());
-
-    CreatePartyRequest partyReq =
-        new CreatePartyRequest(req.name(), req.address(), PartyType.EMPLOYEE);
-
-    CompromisedPasswordDecision decision = dPc.check(req.password());
-    if (decision.isCompromised()) {
-      throw new PasswordCompromisedException("password is compromised");
-    }
-
-    Long partyId = partyService.createParty(partyReq).id();
-    log.info("Party created with id: {}", partyId);
-
-    Employee emp = new Employee();
-    emp.setEmail(req.email());
-    emp.setPassword(encoder.encode(req.password()));
-    emp.setSalary(req.salary());
-    emp.setStatus(req.status());
-    emp.setPartyId(partyId);
-    employeeRepo.save(emp);
-    log.info("Employee saved with id: {}", emp.getId());
-
-    boolean indexCreated =
-        loginIndexService.createIndex(emp.getId(), SecuritySubjectType.EMPLOYEE, req.email());
-    log.info("Login index creation result: {} for email: {}", indexCreated, req.email());
-
-    if (!indexCreated) {
-      log.error(
-          "Failed to create login index for email: {}, rolling back employee creation",
-          req.email());
-      throw new RuntimeException("Failed to create login index");
-    }
-    authService.startSecurityApplication();
-    RoleViewDto superAdminRole = roleService.getRoleByName("SUPER_ADMIN");
-    if (superAdminRole == null) {
-      throw new TargetNotFound("SUPER_ADMIN role not found cannot start application");
-    }
-    roleService.assignRoleToParty(
-        new AssignRoleToPartyRequest(
-            SecuritySubjectType.EMPLOYEE, emp.getId(), superAdminRole.id()));
-
-    List<String> systemAuthorites =
-        Arrays.stream(SystemAuthorities.values()).map(SystemAuthorities::name).toList();
-
-    for (String authority : systemAuthorites) {
-      authorityService.createAuthority(new CreateAuthorityRequest(authority));
-    }
-
-    EmployeeViewDTO resp = employeeMapper.toEmployeeViewDTO(emp);
-    log.info("employee created successfully and application started succesfolly  {}", resp);
-    return resp;
   }
 }

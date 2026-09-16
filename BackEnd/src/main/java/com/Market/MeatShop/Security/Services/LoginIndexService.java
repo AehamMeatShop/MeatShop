@@ -3,6 +3,7 @@ package com.Market.MeatShop.Security.Services;
 import com.Market.MeatShop.Security.Entities.LoginIndex;
 import com.Market.MeatShop.Security.Enums.SecuritySubjectType;
 import com.Market.MeatShop.Security.Repositories.LoginIndexRepo;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
@@ -42,9 +43,13 @@ public class LoginIndexService {
   }
 
   @Transactional
-  public boolean updateEmail(String oldEmail, String newEmail) {
+  public boolean updateEmail(@NotNull String oldEmail, @NotNull String newEmail) {
     log.info("Attempting to update login index email from {} to {}", oldEmail, newEmail);
 
+    if (oldEmail.equals(newEmail) || newEmail == null) {
+      log.info("updating failed because they are the same !  ");
+      return true;
+    }
     LoginIndex index = loginIndexRepo.findByEmail(oldEmail).orElse(null);
     if (index == null) {
       log.warn("Login index not found for email: {}", oldEmail);
@@ -63,6 +68,7 @@ public class LoginIndexService {
       return true;
     } catch (Exception e) {
       log.error("Failed to update login index email from {} to {}", oldEmail, newEmail, e);
+      log.error(e.getMessage());
       return false;
     }
   }

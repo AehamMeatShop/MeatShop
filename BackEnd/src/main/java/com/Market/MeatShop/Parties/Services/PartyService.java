@@ -134,8 +134,9 @@ public class PartyService {
 
   @Transactional
   public void deleteParty(Long id) {
-    findPartyByIdEn(id);
-    partyRepo.deleteById(id);
+    Party party = findPartyByIdEn(id);
+
+    partyRepo.delete(party);
     log.info("party deleted {}", id);
   }
 }

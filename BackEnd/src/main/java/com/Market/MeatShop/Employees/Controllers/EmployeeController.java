@@ -55,14 +55,15 @@ public class EmployeeController {
   public ResponseEntity<?> updateEmployeeProfile(
       @Valid @RequestBody UpdateEmployeeProfileReq req, @PathVariable Long id) {
     log.info("PUT /employees/{} requested", id);
-    return ResponseEntity.status(HttpStatus.ACCEPTED).body(employeeService.updateEmployee(req, id));
+    return ResponseEntity.status(HttpStatus.ACCEPTED)
+        .body(employmentOrchestra.updateEmployee(req, id));
   }
 
   @PreAuthorize("hasAuthority('EMPLOYEE_MANAGEMENT')")
   @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteEmployee(@PathVariable Long id) {
     log.info("DELETE /employees/{} requested", id);
-    employeeService.deleteEmployee(id);
+    employmentOrchestra.deleteEmployee(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 
@@ -82,8 +83,8 @@ public class EmployeeController {
   }
 
   @PostMapping("/start-application")
-  public ResponseEntity<?> startApplication(@RequestBody @Valid CreateEmployeeReq request) {
+  public ResponseEntity<?> startApplication(@RequestBody @Valid OrchCreateEmpReq request) {
     log.info("POST /employees/start-application requested");
-    return ResponseEntity.status(HttpStatus.OK).body(employeeService.startApplication(request));
+    return ResponseEntity.status(HttpStatus.OK).body(employmentOrchestra.startApplication(request));
   }
 }

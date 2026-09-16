@@ -4,28 +4,44 @@ import com.Market.MeatShop.Employees.DTOs.EmployeeFullViewDTO;
 import com.Market.MeatShop.Employees.DTOs.EmployeeViewDTO;
 import com.Market.MeatShop.Employees.DTOs.Requests.CreateEmpContactReq;
 import com.Market.MeatShop.Employees.DTOs.Requests.CreateEmployeeReq;
-import com.Market.MeatShop.Employees.Entities.Employee;
-import com.Market.MeatShop.Employees.Enums.EmployeeStatus;
-import com.Market.MeatShop.Employees.Mappers.EmployeeMapper;
+
+import com.Market.MeatShop.Employees.DTOs.Requests.UpdateEmployeeProfileReq;
+import com.Market.MeatShop.Employees.DTOs.Requests.UpdateEmployeeReq;
+import com.Market.MeatShop.Employees.DTOs.Rsponses.EmployeeUpdateResponse;
+
 import com.Market.MeatShop.Employees.Services.EmployeeService;
+
 import com.Market.MeatShop.Orchestas.requests.OrchCreateEmpReq;
 import com.Market.MeatShop.Parties.DTOs.PartyContactViewDTO;
 import com.Market.MeatShop.Parties.DTOs.Requests.CreatePartyContactReq;
 import com.Market.MeatShop.Parties.DTOs.Requests.CreatePartyRequest;
+
+import com.Market.MeatShop.Parties.DTOs.Requests.UpdatePartyReq;
+import com.Market.MeatShop.Parties.DTOs.Responses.UpdatePartyResp;
 import com.Market.MeatShop.Parties.Enums.PartyType;
 import com.Market.MeatShop.Parties.Services.PartyContactService;
 import com.Market.MeatShop.Parties.Services.PartyService;
+
+import com.Market.MeatShop.Security.DTOs.Requests.AssignRoleToPartyRequest;
+import com.Market.MeatShop.Security.DTOs.Requests.CreateAuthorityRequest;
+import com.Market.MeatShop.Security.DTOs.RoleViewDto;
 import com.Market.MeatShop.Security.Enums.SecuritySubjectType;
+import com.Market.MeatShop.Security.Services.AuthService;
+import com.Market.MeatShop.Security.Services.AuthorityService;
 import com.Market.MeatShop.Security.Services.LoginIndexService;
-import com.Market.MeatShop.Shared.Exceptions.PasswordCompromisedException;
+
+import com.Market.MeatShop.Security.Services.RoleService;
+
 import com.Market.MeatShop.Shared.Exceptions.TargetNotFound;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotNull;
+import com.Market.MeatShop.Utils.SystemAuthorities;
+import jakarta.transaction.Transactional;
+
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.Length;
-import org.springframework.security.authentication.password.CompromisedPasswordDecision;
+
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -34,16 +50,25 @@ public class EmploymentOrchestra {
   private final PartyService partyService;
   private final PartyContactService parContService;
   private final LoginIndexService loginIndexService;
+  private final RoleService roleService;
+  private final AuthorityService authorityService;
+  private final AuthService authService;
 
   public EmploymentOrchestra(
       EmployeeService employeeService,
       PartyService partyService,
       PartyContactService parContService,
-      LoginIndexService loginIndexService) {
+      LoginIndexService loginIndexService,
+      RoleService roleService,
+      AuthorityService authorityService,
+      AuthService authService) {
     this.employeeService = employeeService;
     this.partyService = partyService;
     this.parContService = parContService;
     this.loginIndexService = loginIndexService;
+    this.roleService = roleService;
+    this.authorityService = authorityService;
+    this.authService = authService;
   }
 
   public EmployeeViewDTO createEmployee(OrchCreateEmpReq req) {
@@ -57,13 +82,7 @@ public class EmploymentOrchestra {
     EmployeeViewDTO emp =
         employeeService.createEmployee(
             new CreateEmployeeReq(
-                req.name(),
-                req.address(),
-                req.email(),
-                req.password(),
-                req.salary(),
-                partyId,
-                req.status()));
+                req.email(), req.password(), req.salary(), partyId, req.status()));
 
     boolean indexCreated =
         loginIndexService.createIndex(emp.id(), SecuritySubjectType.EMPLOYEE, req.email());
@@ -88,5 +107,105 @@ public class EmploymentOrchestra {
     PartyContactViewDTO resp = parContService.createPartyContact(partyContactReq);
     log.info("employee contact created {}", resp);
     return resp;
+  }
+
+  @Transactional
+  public EmployeeFullViewDTO updateEmployee(UpdateEmployeeProfileReq req, Long id) {
+
+    EmployeeUpdateResponse updateEmpResp =
+        employeeService.updateEmployee(
+            new UpdateEmployeeReq(req.email(), req.password(), req.salary(), req.status()), id);
+
+    log.info("employee profile updated successfully {}", updateEmpResp.newData());
+
+    UpdatePartyResp partyResp =
+        partyService.updateParty(
+            new UpdatePartyReq(req.name(), req.address(), null), updateEmpResp.newData().partyId());
+
+    boolean updateIndexRes =
+        loginIndexService.updateEmail(
+            updateEmpResp.oldData().email(), updateEmpResp.newData().email());
+    if (!updateIndexRes) {
+      log.error(
+          "Failed to update login index for email change from {} to {}, rolling back employee update",
+          updateEmpResp.oldData().email(),
+          req.email());
+      throw new RuntimeException("Failed to update login index");
+    }
+    EmployeeFullViewDTO resp =
+        new EmployeeFullViewDTO(updateEmpResp.newData(), partyResp.partyInfo());
+    log.info("employee updated successfully {}", resp);
+    return resp;
+  }
+
+  @Transactional
+  public void deleteEmployee(Long id) {
+    EmployeeViewDTO deletedProfile = employeeService.deleteEmployee(id);
+
+    log.info("Deleting login index for email: {}", deletedProfile.email());
+    boolean indexDeleted = loginIndexService.deleteIndex(deletedProfile.email());
+    log.info("Login index deletion result: {} for email: {}", indexDeleted, deletedProfile.email());
+
+    if (!indexDeleted) {
+      log.error(
+          "Failed to delete login index for email: {}, rolling back employee deletion",
+          deletedProfile.email());
+      throw new TargetNotFound("Failed to delete login index");
+    }
+
+    log.info("Deleting party roles for employee id: {}", deletedProfile.id());
+    roleService.removeAllRolesForParty(SecuritySubjectType.EMPLOYEE, deletedProfile.id());
+
+    log.info("Deleting party authorities for employee id: {}", deletedProfile.id());
+    authorityService.removeAllAuthoritiesForParty(
+        SecuritySubjectType.EMPLOYEE, deletedProfile.id());
+    parContService.deleteAllPartyContacts(deletedProfile.partyId());
+    partyService.deleteParty(deletedProfile.partyId());
+
+    log.info("employee deleted successfully {}", id);
+  }
+
+  @Transactional
+  public EmployeeViewDTO startApplication(OrchCreateEmpReq req) {
+    log.info("Attempting to start application by create employee with email: {}", req.email());
+
+    CreatePartyRequest partyReq =
+        new CreatePartyRequest(req.name(), req.address(), PartyType.EMPLOYEE);
+
+    Long partyId = partyService.createParty(partyReq).id();
+
+    EmployeeViewDTO emp =
+        employeeService.createEmployee(
+            new CreateEmployeeReq(
+                req.email(), req.password(), req.salary(), partyId, req.status()));
+    log.info("Employee saved with id: {}", emp.id());
+
+    boolean indexCreated =
+        loginIndexService.createIndex(emp.id(), SecuritySubjectType.EMPLOYEE, emp.email());
+    log.info("Login index creation result: {} for email: {}", indexCreated, emp.email());
+
+    if (!indexCreated) {
+      log.error(
+          "Failed to create login index for email: {}, rolling back employee creation",
+          req.email());
+      throw new RuntimeException("Failed to create login index");
+    }
+    authService.startSecurityApplication();
+    RoleViewDto superAdminRole = roleService.getRoleByName("SUPER_ADMIN");
+    if (superAdminRole == null) {
+      throw new TargetNotFound("SUPER_ADMIN role not found cannot start application");
+    }
+    roleService.assignRoleToParty(
+        new AssignRoleToPartyRequest(SecuritySubjectType.EMPLOYEE, emp.id(), superAdminRole.id()));
+
+    List<String> systemAuthorities =
+        Arrays.stream(SystemAuthorities.values()).map(SystemAuthorities::name).toList();
+
+    for (String authority : systemAuthorities) {
+      authorityService.createAuthority(new CreateAuthorityRequest(authority));
+    }
+
+    log.info("employee created successfully and application started successfully  {}", emp);
+    return emp;
   }
 }

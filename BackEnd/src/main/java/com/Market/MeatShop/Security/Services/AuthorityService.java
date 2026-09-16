@@ -6,6 +6,7 @@ import com.Market.MeatShop.Security.DTOs.Requests.AssignAuthorityToPartyRequest;
 import com.Market.MeatShop.Security.DTOs.Requests.CreateAuthorityRequest;
 import com.Market.MeatShop.Security.Entities.Authority;
 import com.Market.MeatShop.Security.Entities.PartyAuthority;
+import com.Market.MeatShop.Security.Entities.PartyRole;
 import com.Market.MeatShop.Security.Entities.RoleAuthority;
 import com.Market.MeatShop.Security.Enums.SecuritySubjectType;
 import com.Market.MeatShop.Security.Mappers.AuthorityMapper;
@@ -103,6 +104,14 @@ public class AuthorityService {
 
   public void removeAuthorityFromParty(
       SecuritySubjectType partyType, Long partyId, Long authorityId) {
+    List<PartyRole> partyRoles = partyRoleRepo.findByPartyTypeAndPartyId(partyType, partyId);
+    boolean isSuperAdmin =
+        partyRoles.stream().anyMatch(pr -> "SUPER_ADMIN".equals(pr.getRole().getName()));
+    if (isSuperAdmin) {
+      log.error("Cannot delete employee with SUPER_ADMIN role");
+      throw new IllegalArgumentException(
+          "Cannot delete Authority from party with SUPER_ADMIN role");
+    }
     PartyAuthority partyAuthority =
         partyAuthorityRepo
             .findByPartyTypeAndPartyIdAndAuthorityId(partyType, partyId, authorityId)
@@ -136,6 +145,14 @@ public class AuthorityService {
   }
 
   public void removeAllAuthoritiesForParty(SecuritySubjectType partyType, Long partyId) {
+    List<PartyRole> partyRoles = partyRoleRepo.findByPartyTypeAndPartyId(partyType, partyId);
+    boolean isSuperAdmin =
+        partyRoles.stream().anyMatch(pr -> "SUPER_ADMIN".equals(pr.getRole().getName()));
+    if (isSuperAdmin) {
+      log.error("Cannot delete Authorities from party SUPER_ADMIN role");
+      throw new IllegalArgumentException("Cannot delete employee with SUPER_ADMIN role");
+    }
+
     List<PartyAuthority> partyAuthorities =
         partyAuthorityRepo.findByPartyTypeAndPartyId(partyType, partyId);
     partyAuthorityRepo.deleteAll(partyAuthorities);

@@ -107,10 +107,10 @@ public class EmployeeService {
     emp = employeeMapper.updateFromReq(req, emp);
     if (req.password() != null || !req.password().isEmpty()) {
 
-      //      CompromisedPasswordDecision decision = dPc.check(req.password());
-      //      if (decision.isCompromised()) {
-      //        throw new PasswordCompromisedException("password is compromised");
-      //      }
+            CompromisedPasswordDecision decision = dPc.check(req.password());
+            if (decision.isCompromised()) {
+              throw new PasswordCompromisedException("password is compromised");
+            }
       emp.setPassword(encoder.encode(req.password()));
     }
 

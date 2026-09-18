@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 public class EmployeeService {
   private final EmployeeMapper employeeMapper;
   private final EmployeeRepo employeeRepo;
-  private final PartyService partyService;
+
   private final PasswordEncoder encoder;
   private final CompromisedPasswordChecker dPc;
 
@@ -66,7 +66,6 @@ public class EmployeeService {
       CompromisedPasswordChecker dPc) {
     this.employeeRepo = employeeRepo;
     this.employeeMapper = employeeMapper;
-    this.partyService = partyService;
 
     this.encoder = encoder;
     this.dPc = dPc;
@@ -107,10 +106,10 @@ public class EmployeeService {
     emp = employeeMapper.updateFromReq(req, emp);
     if (req.password() != null || !req.password().isEmpty()) {
 
-            CompromisedPasswordDecision decision = dPc.check(req.password());
-            if (decision.isCompromised()) {
-              throw new PasswordCompromisedException("password is compromised");
-            }
+      CompromisedPasswordDecision decision = dPc.check(req.password());
+      if (decision.isCompromised()) {
+        throw new PasswordCompromisedException("password is compromised");
+      }
       emp.setPassword(encoder.encode(req.password()));
     }
 
@@ -134,15 +133,14 @@ public class EmployeeService {
     return deletedProfile;
   }
 
-  public EmployeeFullViewDTO getEmployeeById(Long id) {
+  public EmployeeViewDTO getEmployeeById(Long id) {
     Employee employee =
         employeeRepo.findById(id).orElseThrow(() -> new TargetNotFound("employee not found"));
-    PartyViewDTO partyViewDTO = partyService.findPartyById(employee.getPartyId());
-    return new EmployeeFullViewDTO(employeeMapper.toEmployeeViewDTO(employee), partyViewDTO);
+
+    return employeeMapper.toEmployeeViewDTO(employee);
   }
 
-  public Page<EmployeeFullViewDTO> getEmployeesByFilter(
-      EmployeeFilterReq filter, Pageable pageable) {
+  public Page<EmployeeViewDTO> getEmployeesByFilter(EmployeeFilterReq filter, Pageable pageable) {
     pageable
         .getSort()
         .forEach(
@@ -182,31 +180,7 @@ public class EmployeeService {
 
     Page<Employee> employeesPage = employeeRepo.findAll(spec, pageable);
     List<Employee> content = employeesPage.getContent();
-
-    List<Long> partyIds = content.stream().map(Employee::getPartyId).distinct().toList();
-    PartyFilterReq partyFilterReq =
-        new PartyFilterReq(
-            null, filter.name(), filter.address(), PartyType.EMPLOYEE, null, null, null, null);
-    List<PartyViewDTO> parties = partyService.findByFilterServ(partyFilterReq, partyIds);
-    Map<Long, PartyViewDTO> partyMap =
-        parties.stream().collect(Collectors.toMap(PartyViewDTO::id, p -> p));
-
-    List<EmployeeFullViewDTO> result =
-        content.stream()
-            .map(
-                emp -> {
-                  PartyViewDTO party = partyMap.get(emp.getPartyId());
-
-                  if (party == null) return null;
-
-                  return new EmployeeFullViewDTO(employeeMapper.toEmployeeViewDTO(emp), party);
-                })
-            .filter(Objects::nonNull)
-            .toList();
-
-    Page<EmployeeFullViewDTO> resultPage =
-        new PageImpl<>(result, employeesPage.getPageable(), employeesPage.getTotalElements());
-    log.info("employees returned {}", resultPage.getContent());
-    return resultPage;
+    Page<EmployeeViewDTO> resp = employeesPage.map(employeeMapper::toEmployeeViewDTO);
+    return resp;
   }
 }

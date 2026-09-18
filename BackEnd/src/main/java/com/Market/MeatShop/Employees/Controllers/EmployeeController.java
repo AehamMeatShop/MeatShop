@@ -71,7 +71,7 @@ public class EmployeeController {
   @GetMapping("/{id}")
   public ResponseEntity<?> getEmployeeById(@PathVariable Long id) {
     log.info("GET /employees/{} requested", id);
-    return ResponseEntity.status(HttpStatus.OK).body(employeeService.getEmployeeById(id));
+    return ResponseEntity.status(HttpStatus.OK).body(employmentOrchestra.getEmployeeById(id));
   }
 
   @PreAuthorize("hasAuthority('EMPLOYEE_MANAGEMENT')")
@@ -79,7 +79,7 @@ public class EmployeeController {
   public ResponseEntity<?> getEmployeesByFilter(EmployeeFilterReq filter, Pageable pageable) {
     log.info("GET /employees query{} requested", filter);
     return ResponseEntity.status(HttpStatus.OK)
-        .body(employeeService.getEmployeesByFilter(filter, pageable));
+        .body(employmentOrchestra.getEmployeesByFilter(filter, pageable));
   }
 
   @PostMapping("/start-application")
